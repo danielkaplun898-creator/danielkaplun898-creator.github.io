@@ -3,465 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kaplun - App Developer</title>
+  <title>CalorieTracker - Free Nutrition Tracker App</title>
+  <meta name="description" content="Free calorie and nutrition tracking app. Search 600K+ foods, scan barcodes, log meals, track macros, and hit your fitness goals. Built with Flutter.">
+  <meta name="keywords" content="calorie tracker, nutrition app, food tracker, macro tracker, fitness app, weight loss, USDA foods, barcode scanner">
+  <meta property="og:title" content="CalorieTracker - Free Nutrition Tracker App">
+  <meta property="og:description" content="Track every bite. Search 600K+ foods, scan barcodes, log meals, and hit your goals.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://danielkaplun898-creator.github.io/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --green: #2E7D32;
-      --green-light: #4CAF50;
-      --green-dark: #1B5E20;
-      --bg: #0a0a0a;
-      --bg-card: #141414;
-      --bg-card-hover: #1a1a1a;
-      --text: #ffffff;
-      --text-muted: #888888;
-      --border: #222222;
-    }
-
+    :root { --green: #2E7D32; --green-light: #4CAF50; --bg: #0a0a0a; --bg-card: #141414; --text: #fff; --text-muted: #888; --border: #222; --cyan: #06B6D4; --amber: #F59E0B; --red: #EF4444; --purple: #8B5CF6; }
     html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* Nav */
-    nav {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      z-index: 100;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      backdrop-filter: blur(20px);
-      background: rgba(10, 10, 10, 0.8);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--text);
-      text-decoration: none;
-    }
-
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+    nav { position: fixed; top: 0; width: 100%; z-index: 100; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(20px); background: rgba(10,10,10,0.8); border-bottom: 1px solid var(--border); }
+    .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text); text-decoration: none; }
     .logo span { color: var(--green-light); }
-
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 2rem;
-    }
-
-    nav ul a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
+    nav ul { list-style: none; display: flex; gap: 2rem; }
+    nav ul a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
     nav ul a:hover { color: var(--text); }
-
-    /* Hero */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 6rem 2rem 4rem;
-      position: relative;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -200px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(46,125,50,0.15) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-    }
-
-    .badge .dot {
-      width: 8px;
-      height: 8px;
-      background: var(--green-light);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    .hero h1 {
-      font-size: clamp(3rem, 8vw, 6rem);
-      font-weight: 900;
-      letter-spacing: -3px;
-      line-height: 1;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(135deg, #fff 30%, var(--green-light) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero p {
-      font-size: 1.2rem;
-      color: var(--text-muted);
-      max-width: 550px;
-      margin-bottom: 2.5rem;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.9rem 2rem;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
-      cursor: pointer;
-      border: none;
-    }
-
-    .btn-primary {
-      background: var(--green);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--green-light);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(46,125,50,0.3);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-outline:hover {
-      background: var(--bg-card);
-      border-color: var(--text-muted);
-    }
-
-    /* Sections */
+    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 6rem 2rem 4rem; position: relative; }
+    .hero::before { content: ''; position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(46,125,50,0.15) 0%, transparent 70%); pointer-events: none; }
+    .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 100px; border: 1px solid var(--border); background: var(--bg-card); font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem; }
+    .badge .dot { width: 8px; height: 8px; background: var(--green-light); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .hero h1 { font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; letter-spacing: -3px; line-height: 1; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff 30%, var(--green-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 550px; margin-bottom: 2.5rem; }
+    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.9rem 2rem; border-radius: 12px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all 0.2s; cursor: pointer; border: none; }
+    .btn-primary { background: var(--green); color: white; }
+    .btn-primary:hover { background: var(--green-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(46,125,50,0.3); }
+    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-outline:hover { background: var(--bg-card); border-color: var(--text-muted); }
+    .btn-cyan { background: linear-gradient(135deg, var(--cyan), var(--green-light)); color: white; }
+    .btn-cyan:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(6,182,212,0.3); }
     section { padding: 6rem 2rem; }
-
-    .section-title {
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--green-light);
-      margin-bottom: 1rem;
-    }
-
-    .section-heading {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 800;
-      letter-spacing: -1.5px;
-      margin-bottom: 1.5rem;
-    }
-
-    .section-desc {
-      color: var(--text-muted);
-      max-width: 600px;
-      font-size: 1.05rem;
-    }
-
-    /* App Showcase */
-    #apps { max-width: 1100px; margin: 0 auto; }
-
-    .app-card {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-      margin-top: 3rem;
-    }
-
-    .app-info h3 {
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 1rem;
-    }
-
-    .app-info p {
-      color: var(--text-muted);
-      margin-bottom: 1.5rem;
-      font-size: 1.05rem;
-      line-height: 1.7;
-    }
-
-    .feature-list {
-      list-style: none;
-      margin-bottom: 2rem;
-    }
-
-    .feature-list li {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem 0;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    .feature-list li .check {
-      width: 22px;
-      height: 22px;
-      background: rgba(46,125,50,0.15);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--green-light);
-      font-size: 0.75rem;
-      flex-shrink: 0;
-    }
-
-    .app-mockup {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 400px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .phone-frame {
-      width: 220px;
-      height: 440px;
-      background: #1a1a1a;
-      border-radius: 28px;
-      border: 3px solid #333;
-      padding: 12px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .phone-screen {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(160deg, #1a2e1a 0%, #0d1f0d 100%);
-      border-radius: 18px;
-      display: flex;
-      flex-direction: column;
-      padding: 16px 14px;
-      overflow: hidden;
-    }
-
-    .phone-header {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
+    .section-title { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--green-light); margin-bottom: 1rem; }
+    .section-heading { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -1.5px; margin-bottom: 1.5rem; }
+    .section-desc { color: var(--text-muted); max-width: 600px; font-size: 1.05rem; }
+    #features { max-width: 1100px; margin: 0 auto; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+    .feature-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; transition: all 0.3s; position: relative; overflow: hidden; }
+    .feature-card:hover { border-color: var(--green); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--green), var(--cyan)); opacity: 0; transition: opacity 0.3s; }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon { width: 48px; height: 48px; background: rgba(76,175,80,0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 1.2rem; }
+    .feature-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .feature-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+    .app-card { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-top: 3rem; max-width: 1100px; margin-left: auto; margin-right: auto; }
+    .app-info h3 { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 1rem; }
+    .app-info p { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.7; }
+    .feature-list { list-style: none; margin-bottom: 2rem; }
+    .feature-list li { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; color: var(--text-muted); font-size: 0.95rem; }
+    .feature-list li .check { width: 22px; height: 22px; background: rgba(46,125,50,0.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--green-light); font-size: 0.75rem; flex-shrink: 0; }
+    .app-mockup { background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; padding: 2rem; display: flex; justify-content: center; align-items: center; min-height: 400px; position: relative; overflow: hidden; }
+    .phone-frame { width: 220px; height: 440px; background: #1a1a1a; border-radius: 28px; border: 3px solid #333; padding: 12px; position: relative; overflow: hidden; }
+    .phone-screen { width: 100%; height: 100%; background: linear-gradient(160deg, #0d2818 0%, #050A0F 100%); border-radius: 18px; display: flex; flex-direction: column; padding: 16px 14px; overflow: hidden; }
+    .phone-header { text-align: center; margin-bottom: 12px; }
     .phone-header .greeting { font-size: 10px; color: #888; }
     .phone-header .title { font-size: 16px; font-weight: 800; margin-top: 2px; }
-
-    .phone-ring {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      border: 8px solid #2a2a2a;
-      border-top-color: var(--green-light);
-      border-right-color: var(--green-light);
-      margin: 0 auto 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .phone-ring::after {
-      content: '';
-      position: absolute;
-      inset: -8px;
-      border-radius: 50%;
-      border: 8px solid transparent;
-      border-top-color: var(--green);
-      border-right-color: var(--green);
-      transform: rotate(45deg);
-    }
-
+    .phone-ring { width: 110px; height: 110px; border-radius: 50%; border: 8px solid #2a2a2a; border-top-color: var(--green-light); border-right-color: var(--green-light); margin: 0 auto 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+    .phone-ring::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; border: 8px solid transparent; border-top-color: var(--green); border-right-color: var(--green); transform: rotate(45deg); }
     .ring-cal { font-size: 22px; font-weight: 900; color: white; }
     .ring-label { font-size: 8px; color: #888; }
-
-    .phone-macros {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-
-    .macro-pill {
-      flex: 1;
-      background: #1e1e1e;
-      border-radius: 10px;
-      padding: 8px 6px;
-      text-align: center;
-    }
-
+    .phone-macros { display: flex; gap: 6px; margin-bottom: 12px; }
+    .macro-pill { flex: 1; background: rgba(255,255,255,0.06); border-radius: 10px; padding: 8px 6px; text-align: center; backdrop-filter: blur(10px); }
     .macro-pill .val { font-size: 13px; font-weight: 700; }
     .macro-pill .lbl { font-size: 7px; color: #888; margin-top: 2px; }
     .macro-pill.protein .val { color: #4FC3F7; }
     .macro-pill.carbs .val { color: #FFB74D; }
     .macro-pill.fat .val { color: #EF5350; }
-
     .phone-meals { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-
-    .meal-item {
-      background: #1e1e1e;
-      border-radius: 10px;
-      padding: 8px 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
+    .meal-item { background: rgba(255,255,255,0.06); border-radius: 10px; padding: 8px 10px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
     .meal-item .meal-name { font-size: 10px; font-weight: 600; }
     .meal-item .meal-cal { font-size: 10px; color: #888; }
     .meal-item .meal-icon { font-size: 12px; margin-right: 6px; }
-
-    /* About */
     #about { max-width: 800px; margin: 0 auto; }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
-
-    .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      text-align: center;
-    }
-
-    .stat-card .number {
-      font-size: 2.5rem;
-      font-weight: 900;
-      color: var(--green-light);
-      line-height: 1;
-    }
-
-    .stat-card .label {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-top: 0.5rem;
-    }
-
-    .about-text {
-      margin-top: 3rem;
-      color: var(--text-muted);
-      font-size: 1.1rem;
-      line-height: 1.8;
-    }
-
-    /* Contact */
+    .about-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 3rem; }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; text-align: center; }
+    .stat-card .number { font-size: 2.5rem; font-weight: 900; color: var(--green-light); line-height: 1; }
+    .stat-card .label { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; }
+    .about-text { margin-top: 3rem; color: var(--text-muted); font-size: 1.1rem; line-height: 1.8; }
+    #download { text-align: center; max-width: 700px; margin: 0 auto; }
+    .download-card { background: linear-gradient(135deg, rgba(46,125,50,0.1), rgba(6,182,212,0.05)); border: 1px solid rgba(46,125,50,0.3); border-radius: 24px; padding: 4rem 3rem; margin-top: 3rem; position: relative; overflow: hidden; }
+    .download-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 30% 30%, rgba(46,125,50,0.1), transparent 50%); pointer-events: none; }
+    .download-card h2 { font-size: 2.5rem; font-weight: 900; letter-spacing: -1.5px; margin-bottom: 1rem; }
+    .download-card p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .version-info { display: flex; gap: 2rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap; }
+    .version-tag { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 0.6rem 1.2rem; font-size: 0.85rem; color: var(--text-muted); }
+    .version-tag strong { color: var(--text); }
     #contact { max-width: 600px; margin: 0 auto; text-align: center; }
-
-    .contact-links {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-top: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .contact-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.8rem 1.5rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .contact-link:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--green);
-      transform: translateY(-2px);
-    }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 3rem 2rem;
-      border-top: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-
+    .contact-links { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap; }
+    .contact-link { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; color: var(--text); text-decoration: none; font-weight: 500; transition: all 0.2s; }
+    .contact-link:hover { background: var(--bg-card-hover); border-color: var(--green); transform: translateY(-2px); }
+    footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
     footer a { color: var(--green-light); text-decoration: none; }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      nav ul { display: none; }
-      .app-card { grid-template-columns: 1fr; gap: 2rem; }
-      .about-grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 768px) { nav ul { display: none; } .app-card { grid-template-columns: 1fr; gap: 2rem; } .about-grid { grid-template-columns: repeat(2, 1fr); } .features-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <nav>
     <a href="#" class="logo">kaplun<span>.</span></a>
     <ul>
-      <li><a href="#apps">Apps</a></li>
+      <li><a href="#features">Features</a></li>
       <li><a href="#about">About</a></li>
+      <li><a href="#download">Download</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
@@ -469,111 +116,109 @@
   <section class="hero">
     <div class="badge">
       <span class="dot"></span>
-      Available now
+      Free &middot; No sign-up required
     </div>
-    <h1>Kaplun</h1>
-    <p>Building clean, functional apps that make everyday life better. Currently focused on health & nutrition tools.</p>
+    <h1>CalorieTracker</h1>
+    <p>Track every bite. Search 600K+ foods, scan barcodes, log meals, and crush your nutrition goals. Built with Flutter.</p>
     <div class="btn-group">
-      <a href="#apps" class="btn btn-primary">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-        View Apps
+      <a href="CalorieTracker.apk" class="btn btn-cyan">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download APK
       </a>
-      <a href="#contact" class="btn btn-outline">Get in Touch</a>
+      <a href="#features" class="btn btn-outline">See Features</a>
+    </div>
+    <div class="version-info">
+      <div class="version-tag"><strong>v3.1</strong> &middot; Latest</div>
+      <div class="version-tag"><strong>69MB</strong> &middot; Android 5.0+</div>
+      <div class="version-tag"><strong>600K+</strong> Foods</div>
     </div>
   </section>
 
-  <section id="apps">
-    <div class="section-title">Featured App</div>
-    <div class="section-heading">CalorieTracker</div>
-    <div class="section-desc">A comprehensive nutrition tracking app built with Flutter. Search 300,000+ foods, log meals, scan barcodes, and hit your fitness goals.</div>
+  <section id="features">
+    <div class="section-title">Features</div>
+    <div class="section-heading">Everything you need</div>
+    <div class="section-desc">A complete nutrition tracking toolkit in your pocket.</div>
 
-    <div class="app-card">
-      <div class="app-info">
-        <h3>Track Every Bite.</h3>
-        <p>CalorieTracker makes it effortless to monitor your daily nutrition. Powered by the USDA FoodData Central database with real nutritional data for hundreds of thousands of foods.</p>
-        <ul class="feature-list">
-          <li><span class="check">&#10003;</span> Search 300,000+ foods with USDA data</li>
-          <li><span class="check">&#10003;</span> Log meals by breakfast, lunch, dinner &amp; snack</li>
-          <li><span class="check">&#10003;</span> Scan barcodes for instant food lookup</li>
-          <li><span class="check">&#10003;</span> Track protein, carbs, fat &amp; calories</li>
-          <li><span class="check">&#10003;</span> Weekly history &amp; statistics with charts</li>
-          <li><span class="check">&#10003;</span> Cloud sync with user accounts</li>
-          <li><span class="check">&#10003;</span> Customizable daily calorie &amp; macro goals</li>
-        </ul>
-        <div class="btn-group">
-          <a href="#" class="btn btn-primary" onclick="downloadAPK(); return false;">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download APK
-          </a>
-          <a href="#about" class="btn btn-outline">Learn More</a>
-        </div>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 1rem;">v1.0.0 &middot; 67MB &middot; Android 5.0+</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>USDA Food Search</h3>
+        <p>Search 600,000+ foods powered by the USDA FoodData Central database. Real nutritional data for real foods.</p>
       </div>
-
-      <div class="app-mockup">
-        <div class="phone-frame">
-          <div class="phone-screen">
-            <div class="phone-header">
-              <div class="greeting">Today</div>
-              <div class="title">CalorieTracker</div>
-            </div>
-
-            <div class="phone-ring">
-              <div class="ring-cal">1,847</div>
-              <div class="ring-label">of 2,000 kcal</div>
-            </div>
-
-            <div class="phone-macros">
-              <div class="macro-pill protein">
-                <div class="val">142g</div>
-                <div class="lbl">Protein</div>
-              </div>
-              <div class="macro-pill carbs">
-                <div class="val">218g</div>
-                <div class="lbl">Carbs</div>
-              </div>
-              <div class="macro-pill fat">
-                <div class="val">58g</div>
-                <div class="lbl">Fat</div>
-              </div>
-            </div>
-
-            <div class="phone-meals">
-              <div class="meal-item">
-                <div><span class="meal-icon">&#9728;</span><span class="meal-name">Breakfast</span></div>
-                <div class="meal-cal">485 cal</div>
-              </div>
-              <div class="meal-item">
-                <div><span class="meal-icon">&#9925;</span><span class="meal-name">Lunch</span></div>
-                <div class="meal-cal">720 cal</div>
-              </div>
-              <div class="meal-item">
-                <div><span class="meal-icon">&#9790;</span><span class="meal-name">Dinner</span></div>
-                <div class="meal-cal">512 cal</div>
-              </div>
-              <div class="meal-item">
-                <div><span class="meal-icon">&#127850;</span><span class="meal-name">Snack</span></div>
-                <div class="meal-cal">130 cal</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Barcode Scanner</h3>
+        <p>Scan product barcodes for instant nutrition lookup. 1M+ products in the database. Pro feature with 7-day free trial.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🍽️</div>
+        <h3>Meal Logging</h3>
+        <p>Log breakfast, lunch, dinner, and snacks separately. See exactly where your calories come from.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Macro Tracking</h3>
+        <p>Track protein, carbs, fat, and fiber with color-coded progress. Auto-calculated goals based on your stats.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <h3>Achievements</h3>
+        <p>12 unlockable badges for milestones. Stay motivated with streaks, protein goals, and consistency rewards.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🍕</div>
+        <h3>Custom Foods</h3>
+        <p>Create your own food entries for homemade meals and recipes. Full nutrition breakdown included.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💧</div>
+        <h3>Water Tracking</h3>
+        <p>Track daily water intake with a simple tap. Set goals and monitor your hydration progress.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚖️</div>
+        <h3>Weight Tracker</h3>
+        <p>Log weight over time with interactive line charts. Visualize your progress toward your goal weight.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📐</div>
+        <h3>Body Measurements</h3>
+        <p>Track waist, chest, arms, and hips with trend charts. See how your body composition changes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧮</div>
+        <h3>BMI & TDEE Calculator</h3>
+        <p>Auto-calculated BMI with categories, and Mifflin-St Jeor equation for your personalized calorie goal.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Statistics & Charts</h3>
+        <p>Weekly bar charts, macro pie charts, daily averages, and comprehensive history with search.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📤</div>
+        <h3>CSV Export</h3>
+        <p>Export all your meal data to CSV. Import into spreadsheets or share with your nutritionist.</p>
       </div>
     </div>
   </section>
 
   <section id="about">
     <div class="section-title">About</div>
-    <div class="section-heading">Building tools that matter</div>
+    <div class="section-heading">Built by Kaplun</div>
 
     <div class="about-grid">
       <div class="stat-card">
-        <div class="number">1</div>
-        <div class="label">App Published</div>
+        <div class="number">600K+</div>
+        <div class="label">Foods in Database</div>
       </div>
       <div class="stat-card">
-        <div class="number">300K+</div>
-        <div class="label">Foods in Database</div>
+        <div class="number">12</div>
+        <div class="label">Achievements</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">Free</div>
+        <div class="label">No Sign-Up</div>
       </div>
       <div class="stat-card">
         <div class="number">Flutter</div>
@@ -584,7 +229,30 @@
     <div class="about-text">
       <p>Hi, I'm <strong>Kaplun</strong> - an independent app developer focused on building clean, functional mobile applications. I believe in creating tools that solve real problems and make everyday life a little easier.</p>
       <br>
-      <p>My first release, <strong>CalorieTracker</strong>, is a comprehensive nutrition tracking app built with Flutter. It features food search powered by the USDA database, barcode scanning, meal logging, macro tracking, and cloud sync - everything you need to stay on top of your nutrition goals.</p>
+      <p><strong>CalorieTracker</strong> is a free, no-nonsense nutrition tracking app. No account required, no data sold. Just open the app and start tracking. Premium features like barcode scanning are available for $4.99 one-time, or free during your 7-day trial.</p>
+    </div>
+  </section>
+
+  <section id="download">
+    <div class="section-title">Download</div>
+    <div class="section-heading">Get the app</div>
+
+    <div class="download-card">
+      <h2>Start tracking today</h2>
+      <p>Free download. No account required. Works offline after first load.</p>
+      <div class="btn-group" style="justify-content: center;">
+        <a href="CalorieTracker.apk" class="btn btn-cyan" style="font-size: 1.1rem; padding: 1rem 3rem;">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download CalorieTracker.apk
+        </a>
+      </div>
+      <div class="version-info" style="margin-top: 1.5rem;">
+        <div class="version-tag">v3.1</div>
+        <div class="version-tag">69MB</div>
+        <div class="version-tag">Android 5.0+</div>
+        <div class="version-tag">SHA-256 verified</div>
+      </div>
+      <p style="margin-top: 2rem; font-size: 0.85rem;">After downloading, enable "Install from unknown sources" in your Android settings, then open the APK file.</p>
     </div>
   </section>
 
@@ -602,7 +270,7 @@
         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
         GitHub
       </a>
-      <a href="#" class="contact-link" onclick="downloadAPK(); return false;">
+      <a href="CalorieTracker.apk" class="contact-link">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download App
       </a>
@@ -610,23 +278,16 @@
   </section>
 
   <footer>
-    <p>&copy; 2026 <a href="#">Kaplun</a>. All rights reserved.</p>
+    <p>&copy; 2026 <a href="#">Kaplun</a>. All rights reserved. Built with Flutter.</p>
   </footer>
 
   <script>
-    const APK_URL = 'CalorieTracker.apk';
-
-    function downloadAPK() {
-      window.location.href = APK_URL;
-    }
-
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
         document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
       });
     });
-
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -635,8 +296,7 @@
         }
       });
     }, { threshold: 0.1 });
-
-    document.querySelectorAll('.app-card, .stat-card, .about-text, .contact-links').forEach(el => {
+    document.querySelectorAll('.feature-card, .app-card, .stat-card, .about-text, .download-card, .contact-links').forEach(el => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(30px)';
       el.style.transition = 'all 0.6s ease-out';
