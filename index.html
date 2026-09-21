@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaplun - App Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --green: #2E7D32;
+      --green-light: #4CAF50;
+      --green-dark: #1B5E20;
+      --bg: #0a0a0a;
+      --bg-card: #141414;
+      --bg-card-hover: #1a1a1a;
+      --text: #ffffff;
+      --text-muted: #888888;
+      --border: #222222;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(20px);
+      background: rgba(10, 10, 10, 0.8);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--green-light); }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav ul a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav ul a:hover { color: var(--text); }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(46,125,50,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .badge .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--green-light);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 900;
+      letter-spacing: -3px;
+      line-height: 1;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #fff 30%, var(--green-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 550px;
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--green-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(46,125,50,0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-card);
+      border-color: var(--text-muted);
+    }
+
+    /* Sections */
+    section { padding: 6rem 2rem; }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--green-light);
+      margin-bottom: 1rem;
+    }
+
+    .section-heading {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      max-width: 600px;
+      font-size: 1.05rem;
+    }
+
+    /* App Showcase */
+    #apps { max-width: 1100px; margin: 0 auto; }
+
+    .app-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      margin-top: 3rem;
+    }
+
+    .app-info h3 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 1rem;
+    }
+
+    .app-info p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .feature-list li .check {
+      width: 22px;
+      height: 22px;
+      background: rgba(46,125,50,0.15);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--green-light);
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .app-mockup {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phone-frame {
+      width: 220px;
+      height: 440px;
+      background: #1a1a1a;
+      border-radius: 28px;
+      border: 3px solid #333;
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(160deg, #1a2e1a 0%, #0d1f0d 100%);
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 14px;
+      overflow: hidden;
+    }
+
+    .phone-header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .phone-header .greeting { font-size: 10px; color: #888; }
+    .phone-header .title { font-size: 16px; font-weight: 800; margin-top: 2px; }
+
+    .phone-ring {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 8px solid #2a2a2a;
+      border-top-color: var(--green-light);
+      border-right-color: var(--green-light);
+      margin: 0 auto 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .phone-ring::after {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 8px solid transparent;
+      border-top-color: var(--green);
+      border-right-color: var(--green);
+      transform: rotate(45deg);
+    }
+
+    .ring-cal { font-size: 22px; font-weight: 900; color: white; }
+    .ring-label { font-size: 8px; color: #888; }
+
+    .phone-macros {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .macro-pill {
+      flex: 1;
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 8px 6px;
+      text-align: center;
+    }
+
+    .macro-pill .val { font-size: 13px; font-weight: 700; }
+    .macro-pill .lbl { font-size: 7px; color: #888; margin-top: 2px; }
+    .macro-pill.protein .val { color: #4FC3F7; }
+    .macro-pill.carbs .val { color: #FFB74D; }
+    .macro-pill.fat .val { color: #EF5350; }
+
+    .phone-meals { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+
+    .meal-item {
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .meal-item .meal-name { font-size: 10px; font-weight: 600; }
+    .meal-item .meal-cal { font-size: 10px; color: #888; }
+    .meal-item .meal-icon { font-size: 12px; margin-right: 6px; }
+
+    /* About */
+    #about { max-width: 800px; margin: 0 auto; }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .stat-card .number {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--green-light);
+      line-height: 1;
+    }
+
+    .stat-card .label {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .about-text {
+      margin-top: 3rem;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+
+    /* Contact */
+    #contact { max-width: 600px; margin: 0 auto; text-align: center; }
+
+    .contact-links {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .contact-link:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--green);
+      transform: translateY(-2px);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    footer a { color: var(--green-light); text-decoration: none; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav ul { display: none; }
+      .app-card { grid-template-columns: 1fr; gap: 2rem; }
+      .about-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#" class="logo">kaplun<span>.</span></a>
+    <ul>
+      <li><a href="#apps">Apps</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div class="badge">
+      <span class="dot"></span>
+      Currently building
+    </div>
+    <h1>Kaplun</h1>
+    <p>Building clean, functional apps that make everyday life better. Currently focused on health & nutrition tools.</p>
+    <div class="btn-group">
+      <a href="#apps" class="btn btn-primary">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        View Apps
+      </a>
+      <a href="#contact" class="btn btn-outline">Get in Touch</a>
+    </div>
+  </section>
+
+  <section id="apps">
+    <div class="section-title">Featured App</div>
+    <div class="section-heading">CalorieTracker</div>
+    <div class="section-desc">A comprehensive nutrition tracking app built with Flutter. Search 300,000+ foods, log meals, scan barcodes, and hit your fitness goals.</div>
+
+    <div class="app-card">
+      <div class="app-info">
+        <h3>Track Every Bite.</h3>
+        <p>CalorieTracker makes it effortless to monitor your daily nutrition. Powered by the USDA FoodData Central database with real nutritional data for hundreds of thousands of foods.</p>
+        <ul class="feature-list">
+          <li><span class="check">&#10003;</span> Search 300,000+ foods with USDA data</li>
+          <li><span class="check">&#10003;</span> Log meals by breakfast, lunch, dinner &amp; snack</li>
+          <li><span class="check">&#10003;</span> Scan barcodes for instant food lookup</li>
+          <li><span class="check">&#10003;</span> Track protein, carbs, fat &amp; calories</li>
+          <li><span class="check">&#10003;</span> Weekly history &amp; statistics with charts</li>
+          <li><span class="check">&#10003;</span> Cloud sync with user accounts</li>
+          <li><span class="check">&#10003;</span> Customizable daily calorie &amp; macro goals</li>
+        </ul>
+        <div class="btn-group">
+          <a href="#" class="btn btn-primary" id="play-store-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.807 1.626a1 1 0 010 1.732l-2.808 1.626L15.206 12l2.492-2.492zM5.864 2.658L16.8 8.99l-2.3 2.302-8.636-8.634z"/></svg>
+            Coming to Play Store
+          </a>
+        </div>
+      </div>
+
+      <div class="app-mockup">
+        <div class="phone-frame">
+          <div class="phone-screen">
+            <div class="phone-header">
+              <div class="greeting">Today</div>
+              <div class="title">CalorieTracker</div>
+            </div>
+
+            <div class="phone-ring">
+              <div class="ring-cal">1,847</div>
+              <div class="ring-label">of 2,000 kcal</div>
+            </div>
+
+            <div class="phone-macros">
+              <div class="macro-pill protein">
+                <div class="val">142g</div>
+                <div class="lbl">Protein</div>
+              </div>
+              <div class="macro-pill carbs">
+                <div class="val">218g</div>
+                <div class="lbl">Carbs</div>
+              </div>
+              <div class="macro-pill fat">
+                <div class="val">58g</div>
+                <div class="lbl">Fat</div>
+              </div>
+            </div>
+
+            <div class="phone-meals">
+              <div class="meal-item">
+                <div><span class="meal-icon">&#9728;</span><span class="meal-name">Breakfast</span></div>
+                <div class="meal-cal">485 cal</div>
+              </div>
+              <div class="meal-item">
+                <div><span class="meal-icon">&#9925;</span><span class="meal-name">Lunch</span></div>
+                <div class="meal-cal">720 cal</div>
+              </div>
+              <div class="meal-item">
+                <div><span class="meal-icon">&#9790;</span><span class="meal-name">Dinner</span></div>
+                <div class="meal-cal">512 cal</div>
+              </div>
+              <div class="meal-item">
+                <div><span class="meal-icon">&#127850;</span><span class="meal-name">Snack</span></div>
+                <div class="meal-cal">130 cal</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="section-title">About</div>
+    <div class="section-heading">Building tools that matter</div>
+
+    <div class="about-grid">
+      <div class="stat-card">
+        <div class="number">1</div>
+        <div class="label">App Published</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">300K+</div>
+        <div class="label">Foods in Database</div>
+      </div>
+      <div class="stat-card">
+        <div class="number">Flutter</div>
+        <div class="label">Built With</div>
+      </div>
+    </div>
+
+    <div class="about-text">
+      <p>Hi, I'm <strong>Kaplun</strong> - an independent app developer focused on building clean, functional mobile applications. I believe in creating tools that solve real problems and make everyday life a little easier.</p>
+      <br>
+      <p>My first release, <strong>CalorieTracker</strong>, is a comprehensive nutrition tracking app built with Flutter. It features food search powered by the USDA database, barcode scanning, meal logging, macro tracking, and cloud sync - everything you need to stay on top of your nutrition goals.</p>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="section-title">Contact</div>
+    <div class="section-heading">Let's connect</div>
+    <div class="section-desc" style="margin: 0 auto 1rem;">Have a question, suggestion, or want to collaborate? Reach out anytime.</div>
+
+    <div class="contact-links">
+      <a href="mailto:hello@kaplun.dev" class="contact-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </a>
+      <a href="https://github.com/kaplun" class="contact-link" target="_blank">
+        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+      <a href="https://play.google.com/store/apps/developer?id=Kaplun" class="contact-link" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.807 1.626a1 1 0 010 1.732l-2.808 1.626L15.206 12l2.492-2.492zM5.864 2.658L16.8 8.99l-2.3 2.302-8.636-8.634z"/></svg>
+        Play Store
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 <a href="#">Kaplun</a>. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.app-card, .stat-card, .about-text, .contact-links').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'all 0.6s ease-out';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
