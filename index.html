@@ -99,7 +99,118 @@
     .contact-link:hover { background: var(--bg-card-hover); border-color: var(--green); transform: translateY(-2px); }
     footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
     footer a { color: var(--green-light); text-decoration: none; }
-    @media (max-width: 768px) { nav ul { display: none; } .app-card { grid-template-columns: 1fr; gap: 2rem; } .about-grid { grid-template-columns: repeat(2, 1fr); } .features-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { nav ul { display: none; } .app-card { grid-template-columns: 1fr; gap: 2rem; } .about-grid { grid-template-columns: repeat(2, 1fr); } .features-grid { grid-template-columns: 1fr; } .ads-showcase { flex-direction: column; } .ad-cell { width: 100%; max-width: 400px; } }
+
+    /* Ad showcase */
+    #ads { max-width: 1200px; margin: 0 auto; }
+    .ads-showcase { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; margin-top: 3rem; }
+    .ad-cell { width: 380px; flex-shrink: 0; }
+    .ad-cell-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--green-light); margin-bottom: 0.75rem; text-align: center; }
+
+    /* Ring Ad */
+    .ring-ad { width: 100%; aspect-ratio: 3/4; background: linear-gradient(160deg, #0d2818 0%, #050A0F 50%, #0a1628 100%); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .ring-ad::before { content: ''; position: absolute; top: -120px; left: 50%; transform: translateX(-50%); width: 400px; height: 400px; background: radial-gradient(circle, rgba(52,211,153,0.12) 0%, transparent 70%); animation: ad-glow 3s ease-in-out infinite; }
+    @keyframes ad-glow { 0%,100% { transform: translateX(-50%) scale(1); opacity: .6; } 50% { transform: translateX(-50%) scale(1.1); opacity: 1; } }
+    .ring-svg { width: 160px; height: 160px; transform: rotate(-90deg); margin-bottom: 16px; }
+    .ring-bg-circle { fill: none; stroke: #1a2a20; stroke-width: 10; }
+    .ring-fg { fill: none; stroke: url(#g1); stroke-width: 10; stroke-linecap: round; stroke-dasharray: 440; stroke-dashoffset: 440; animation: ring-draw 2s ease-out .5s forwards; }
+    @keyframes ring-draw { to { stroke-dashoffset: 105; } }
+    .ring-inner { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+    .ring-num { font-size: 36px; font-weight: 900; color: #fff; }
+    .ring-sub { font-size: 12px; color: #888; margin-top: 2px; }
+    .ring-title { font-size: 20px; font-weight: 800; color: #fff; text-align: center; margin-top: 16px; opacity: 0; animation: ufade .6s ease-out 2.2s forwards; }
+    .ring-subtitle { font-size: 13px; color: #888; text-align: center; margin-top: 4px; opacity: 0; animation: ufade .6s ease-out 2.5s forwards; }
+    .ring-cta { margin-top: 16px; padding: 10px 28px; background: linear-gradient(135deg, #34D399, #06B6D4); color: #050A0F; font-weight: 700; font-size: 14px; border: none; border-radius: 10px; cursor: pointer; opacity: 0; animation: ufade .6s ease-out 2.8s forwards; transition: transform .2s, box-shadow .2s; text-decoration: none; display: inline-block; }
+    .ring-cta:hover { transform: scale(1.05); box-shadow: 0 8px 24px rgba(52,211,153,.4); }
+    @keyframes ufade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Scanner Ad */
+    .scan-ad { width: 100%; aspect-ratio: 3/4; background: linear-gradient(180deg, #0a0a0a, #0d1b2a); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .scan-frame { width: 180px; height: 180px; border: 2px solid rgba(52,211,153,.3); border-radius: 16px; position: relative; margin-bottom: 20px; }
+    .scan-c { position: absolute; width: 24px; height: 24px; border-color: #34D399; border-style: solid; border-width: 0; }
+    .scan-c.tl { top: -1px; left: -1px; border-top-width: 3px; border-left-width: 3px; border-radius: 6px 0 0 0; }
+    .scan-c.tr { top: -1px; right: -1px; border-top-width: 3px; border-right-width: 3px; border-radius: 0 6px 0 0; }
+    .scan-c.bl { bottom: -1px; left: -1px; border-bottom-width: 3px; border-left-width: 3px; border-radius: 0 0 0 6px; }
+    .scan-c.br { bottom: -1px; right: -1px; border-bottom-width: 3px; border-right-width: 3px; border-radius: 0 0 6px 0; }
+    .scan-beam { position: absolute; top: 0; left: 8px; right: 8px; height: 2px; background: linear-gradient(90deg, transparent, #34D399, #06B6D4, #34D399, transparent); box-shadow: 0 0 12px rgba(52,211,153,.6); animation: scan-move 2s ease-in-out infinite; }
+    @keyframes scan-move { 0% { top: 4px; } 50% { top: calc(100% - 6px); } 100% { top: 4px; } }
+    .scan-popup { position: absolute; bottom: -70px; background: rgba(20,20,20,.95); border: 1px solid rgba(52,211,153,.3); border-radius: 14px; padding: 14px 20px; text-align: center; backdrop-filter: blur(16px); white-space: nowrap; animation: popup-slide .5s ease-out 2s both; }
+    @keyframes popup-slide { from { opacity: 0; transform: translateY(16px) scale(.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .scan-popup .sp-name { font-size: 13px; font-weight: 700; }
+    .scan-popup .sp-cal { font-size: 20px; font-weight: 900; color: #34D399; }
+    .scan-popup .sp-sub { font-size: 10px; color: #888; }
+    .scan-title { font-size: 20px; font-weight: 800; color: #fff; text-align: center; margin-top: 30px; opacity: 0; animation: ufade .6s ease-out 2.8s forwards; }
+    .scan-subtitle { font-size: 13px; color: #888; text-align: center; margin-top: 4px; opacity: 0; animation: ufade .6s ease-out 3s forwards; }
+
+    /* Search Ad */
+    .search-ad { width: 100%; aspect-ratio: 3/4; background: linear-gradient(160deg, #0f0f1a, #050A0F); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; padding: 24px; }
+    .food-f { position: absolute; font-size: 32px; opacity: 0; animation: food-float 1s ease-out forwards; }
+    @keyframes food-float { from { opacity: 0; transform: translateY(24px) scale(.5); } to { opacity: .15; transform: translateY(0) scale(1); } }
+    .s-bar { width: 100%; max-width: 260px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 18px; position: relative; z-index: 2; }
+    .s-bar-icon { color: #34D399; font-size: 16px; flex-shrink: 0; }
+    .s-bar-text { font-size: 14px; color: #fff; }
+    .s-cursor { display: inline-block; width: 2px; height: 16px; background: #34D399; animation: blink-c 1s step-end infinite; vertical-align: middle; }
+    @keyframes blink-c { 50% { opacity: 0; } }
+    .s-results { width: 100%; max-width: 260px; display: flex; flex-direction: column; gap: 8px; }
+    .s-item { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px; opacity: 0; animation: s-slide .5s ease-out forwards; }
+    .s-item:nth-child(1) { animation-delay: 2.2s; }
+    .s-item:nth-child(2) { animation-delay: 2.6s; }
+    .s-item:nth-child(3) { animation-delay: 3s; }
+    @keyframes s-slide { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
+    .s-item-icon { font-size: 24px; }
+    .s-item-info { flex: 1; }
+    .s-item-name { font-size: 12px; font-weight: 600; }
+    .s-item-sub { font-size: 10px; color: #888; margin-top: 1px; }
+    .s-item-cal { font-size: 14px; font-weight: 800; color: #34D399; }
+    .s-badge { margin-top: 14px; padding: 6px 16px; background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.2); border-radius: 100px; font-size: 12px; font-weight: 600; color: #34D399; opacity: 0; animation: ufade .5s ease-out 3.5s forwards; }
+
+    /* Macro Ad */
+    .macro-ad { width: 100%; aspect-ratio: 3/4; background: linear-gradient(180deg, #0a0a14, #050A0F); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .m-bars { display: flex; gap: 14px; margin-bottom: 28px; }
+    .m-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .m-val { font-size: 14px; font-weight: 800; opacity: 0; animation: ufade .4s ease-out forwards; }
+    .m-val:nth-child(1) { animation-delay: 1.5s; }
+    .m-val:nth-child(2) { animation-delay: 1.8s; }
+    .m-val:nth-child(3) { animation-delay: 2.1s; }
+    .m-val:nth-child(4) { animation-delay: 2.4s; }
+    .m-val.vp { color: #38bdf8; }
+    .m-val.vc { color: #fbbf24; }
+    .m-val.vf { color: #f87171; }
+    .m-val.vfi { color: #a78bfa; }
+    .m-track { width: 40px; height: 150px; background: rgba(255,255,255,.05); border-radius: 20px; overflow: hidden; position: relative; }
+    .m-fill { position: absolute; bottom: 0; left: 0; right: 0; border-radius: 20px; transform-origin: bottom; animation: bar-up 1.5s ease-out forwards; }
+    @keyframes bar-up { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    .m-fill.fp { background: linear-gradient(0deg, #0ea5e9, #38bdf8); height: 80%; animation-delay: .3s; }
+    .m-fill.fc { background: linear-gradient(0deg, #f59e0b, #fbbf24); height: 65%; animation-delay: .6s; }
+    .m-fill.ff { background: linear-gradient(0deg, #ef4444, #f87171); height: 45%; animation-delay: .9s; }
+    .m-fill.ffii { background: linear-gradient(0deg, #8b5cf6, #a78bfa); height: 35%; animation-delay: 1.2s; }
+    .m-lbl { font-size: 10px; color: #888; font-weight: 600; }
+    .macro-title { font-size: 20px; font-weight: 800; color: #fff; text-align: center; opacity: 0; animation: ufade .6s ease-out 2.8s forwards; }
+    .macro-sub { font-size: 13px; color: #888; text-align: center; margin-top: 4px; opacity: 0; animation: ufade .6s ease-out 3s forwards; }
+
+    /* Promo Ad */
+    .promo-ad { width: 100%; aspect-ratio: 3/4; background: linear-gradient(160deg, #0d2818, #050A0F 40%, #1a0a2e); border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .promo-ad::before { content: ''; position: absolute; top: -160px; left: 50%; transform: translateX(-50%); width: 500px; height: 500px; background: radial-gradient(circle, rgba(52,211,153,.08), transparent 70%); }
+    .promo-stars { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; }
+    .promo-star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: star-tw 3s ease-in-out infinite; }
+    @keyframes star-tw { 0%,100% { opacity: .1; } 50% { opacity: .8; } }
+    .promo-icon { width: 64px; height: 64px; background: linear-gradient(135deg, rgba(52,211,153,.2), rgba(6,182,212,.1)); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 14px; z-index: 1; opacity: 0; animation: icon-bounce .6s cubic-bezier(.175,.885,.32,1.275) .3s forwards; }
+    @keyframes icon-bounce { from { opacity: 0; transform: scale(.3) rotate(-10deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+    .promo-title { font-size: 28px; font-weight: 900; text-align: center; letter-spacing: -1.5px; z-index: 1; opacity: 0; animation: ufade .6s ease-out .8s forwards; }
+    .promo-title .pg { color: #34D399; }
+    .promo-sub { font-size: 13px; color: #888; text-align: center; max-width: 240px; margin: 8px 0 20px; z-index: 1; opacity: 0; animation: ufade .6s ease-out 1.1s forwards; }
+    .promo-pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; max-width: 280px; z-index: 1; margin-bottom: 20px; }
+    .promo-pill { padding: 6px 12px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 100px; font-size: 11px; color: #ccc; opacity: 0; animation: pill-pop .4s ease-out forwards; }
+    .promo-pill:nth-child(1) { animation-delay: 1.4s; }
+    .promo-pill:nth-child(2) { animation-delay: 1.6s; }
+    .promo-pill:nth-child(3) { animation-delay: 1.8s; }
+    .promo-pill:nth-child(4) { animation-delay: 2s; }
+    .promo-pill:nth-child(5) { animation-delay: 2.2s; }
+    .promo-pill:nth-child(6) { animation-delay: 2.4s; }
+    @keyframes pill-pop { from { opacity: 0; transform: translateY(8px) scale(.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .promo-cta { padding: 12px 32px; background: linear-gradient(135deg, #34D399, #06B6D4); color: #050A0F; font-weight: 800; font-size: 15px; border: none; border-radius: 12px; cursor: pointer; z-index: 1; opacity: 0; animation: ufade .6s ease-out 2.8s forwards; transition: transform .2s, box-shadow .2s; text-decoration: none; display: inline-block; }
+    .promo-cta:hover { transform: scale(1.05); box-shadow: 0 10px 36px rgba(52,211,153,.4); }
+    .promo-price { font-size: 11px; color: #888; margin-top: 8px; z-index: 1; opacity: 0; animation: ufade .6s ease-out 3s forwards; }
   </style>
 </head>
 <body>
@@ -109,7 +220,7 @@
       <li><a href="#features">Features</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#download">Download</a></li>
-      <li><a href="ads.html">Ads</a></li>
+      <li><a href="#ads">Promo</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
@@ -200,6 +311,110 @@
         <div class="feature-icon">📤</div>
         <h3>CSV Export</h3>
         <p>Export all your meal data to CSV. Import into spreadsheets or share with your nutritionist.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="ads">
+    <div class="section-title">Promo</div>
+    <div class="section-heading">See it in action</div>
+    <div class="section-desc">Animated previews of what CalorieTracker can do.</div>
+
+    <div class="ads-showcase">
+      <!-- Calorie Ring -->
+      <div class="ad-cell">
+        <div class="ad-cell-label">Calorie Ring</div>
+        <div class="ring-ad">
+          <svg class="ring-svg" viewBox="0 0 160 160">
+            <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%"><stop offset="0%" style="stop-color:#34D399"/><stop offset="100%" style="stop-color:#06B6D4"/></linearGradient></defs>
+            <circle class="ring-bg-circle" cx="80" cy="80" r="70"/>
+            <circle class="ring-fg" cx="80" cy="80" r="70"/>
+          </svg>
+          <div class="ring-inner">
+            <div class="ring-num" id="ring-num">0</div>
+            <div class="ring-sub">of 2,200 goal</div>
+          </div>
+          <div class="ring-title">Track Every Calorie</div>
+          <div class="ring-subtitle">Visual ring shows daily progress at a glance</div>
+          <a href="CalorieTracker.apk" class="ring-cta">Download Free</a>
+        </div>
+      </div>
+
+      <!-- Barcode Scanner -->
+      <div class="ad-cell">
+        <div class="ad-cell-label">Barcode Scanner</div>
+        <div class="scan-ad">
+          <div class="scan-frame">
+            <div class="scan-c tl"></div><div class="scan-c tr"></div>
+            <div class="scan-c bl"></div><div class="scan-c br"></div>
+            <div class="scan-beam"></div>
+            <div class="scan-popup">
+              <div class="sp-name">Coca-Cola Zero 330ml</div>
+              <div class="sp-cal">1 kcal</div>
+              <div class="sp-sub">Scanned instantly</div>
+            </div>
+          </div>
+          <div class="scan-title">Scan. Track. Done.</div>
+          <div class="scan-subtitle">Instant nutrition lookup from any barcode</div>
+        </div>
+      </div>
+
+      <!-- Food Search -->
+      <div class="ad-cell">
+        <div class="ad-cell-label">600K+ Foods</div>
+        <div class="search-ad">
+          <div class="food-f" style="top:8%;left:10%;animation-delay:.2s">🍕</div>
+          <div class="food-f" style="top:15%;right:12%;animation-delay:.5s">🥑</div>
+          <div class="food-f" style="bottom:25%;left:8%;animation-delay:.8s">🍗</div>
+          <div class="food-f" style="bottom:20%;right:10%;animation-delay:1.1s">🥗</div>
+          <div class="s-bar">
+            <span class="s-bar-icon">🔍</span>
+            <span class="s-bar-text" id="s-typed"></span>
+            <span class="s-cursor"></span>
+          </div>
+          <div class="s-results">
+            <div class="s-item"><span class="s-item-icon">🍗</span><div class="s-item-info"><div class="s-item-name">Grilled Chicken Breast</div><div class="s-item-sub">100g · USDA</div></div><div class="s-item-cal">165</div></div>
+            <div class="s-item"><span class="s-item-icon">🍚</span><div class="s-item-info"><div class="s-item-name">White Rice (cooked)</div><div class="s-item-sub">100g · USDA</div></div><div class="s-item-cal">130</div></div>
+            <div class="s-item"><span class="s-item-icon">🥑</span><div class="s-item-info"><div class="s-item-name">Avocado (raw)</div><div class="s-item-sub">100g · USDA</div></div><div class="s-item-cal">160</div></div>
+          </div>
+          <div class="s-badge">600,000+ foods</div>
+        </div>
+      </div>
+
+      <!-- Macro Tracking -->
+      <div class="ad-cell">
+        <div class="ad-cell-label">Macro Tracking</div>
+        <div class="macro-ad">
+          <div class="m-bars">
+            <div class="m-col"><div class="m-val vp">142g</div><div class="m-track"><div class="m-fill fp"></div></div><div class="m-lbl">Protein</div></div>
+            <div class="m-col"><div class="m-val vc">198g</div><div class="m-track"><div class="m-fill fc"></div></div><div class="m-lbl">Carbs</div></div>
+            <div class="m-col"><div class="m-val vf">67g</div><div class="m-track"><div class="m-fill ff"></div></div><div class="m-lbl">Fat</div></div>
+            <div class="m-col"><div class="m-val vfi">28g</div><div class="m-track"><div class="m-fill ffii"></div></div><div class="m-lbl">Fiber</div></div>
+          </div>
+          <div class="macro-title">Color-Coded Macros</div>
+          <div class="macro-sub">Protein, carbs, fat, fiber — tracked automatically</div>
+        </div>
+      </div>
+
+      <!-- Full Promo -->
+      <div class="ad-cell">
+        <div class="ad-cell-label">Full Promo</div>
+        <div class="promo-ad" id="promo-ad">
+          <div class="promo-stars" id="promo-stars"></div>
+          <div class="promo-icon">🔥</div>
+          <div class="promo-title">Calorie<span class="pg">Tracker</span></div>
+          <div class="promo-sub">Track every bite. Hit every goal.</div>
+          <div class="promo-pills">
+            <div class="promo-pill">🔍 600K+ Foods</div>
+            <div class="promo-pill">📱 Barcode Scan</div>
+            <div class="promo-pill">🍽️ Meal Logging</div>
+            <div class="promo-pill">📊 Macros</div>
+            <div class="promo-pill">🏆 Achievements</div>
+            <div class="promo-pill">📤 Export CSV</div>
+          </div>
+          <a href="CalorieTracker.apk" class="promo-cta">Download Free</a>
+          <div class="promo-price">30-day free trial · $3/month after</div>
+        </div>
       </div>
     </div>
   </section>
@@ -303,6 +518,53 @@
       el.style.transition = 'all 0.6s ease-out';
       observer.observe(el);
     });
+
+    // Ring counter
+    const rn = document.getElementById('ring-num');
+    if (rn) {
+      let rc = 0, rt = 1847;
+      setTimeout(() => {
+        const iv = setInterval(() => {
+          rc += Math.ceil(rt / 50);
+          if (rc >= rt) { rc = rt; clearInterval(iv); }
+          rn.textContent = rc.toLocaleString();
+        }, 30);
+      }, 800);
+    }
+
+    // Typewriter search
+    const st = document.getElementById('s-typed');
+    if (st) {
+      const words = ['Chicken breast', 'Avocado', 'Brown rice'];
+      let wi = 0, ci = 0, del = false;
+      setTimeout(() => {
+        setInterval(() => {
+          if (!del) {
+            st.textContent = words[wi].substring(0, ci + 1);
+            ci++;
+            if (ci === words[wi].length) setTimeout(() => { del = true; }, 1200);
+          } else {
+            st.textContent = words[wi].substring(0, ci);
+            ci--;
+            if (ci === 0) { del = false; wi = (wi + 1) % words.length; }
+          }
+        }, 70);
+      }, 500);
+    }
+
+    // Promo stars
+    const ps = document.getElementById('promo-stars');
+    if (ps) {
+      for (let i = 0; i < 25; i++) {
+        const s = document.createElement('div');
+        s.className = 'promo-star';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.animationDelay = Math.random() * 3 + 's';
+        s.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        ps.appendChild(s);
+      }
+    }
   </script>
 </body>
 </html>
