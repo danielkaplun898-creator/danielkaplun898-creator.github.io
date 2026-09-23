@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kaplun Store - Reselling Storefront</title>
+  <meta name="description" content="Kaplun Store - a curated reselling storefront.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --green: #2E7D32; --green-light: #4CAF50; --bg: #0a0a0a; --bg-card: #141414; --text: #fff; --text-muted: #888; --border: #222; --cyan: #06B6D4; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+    nav { position: sticky; top: 0; width: 100%; z-index: 100; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(20px); background: rgba(10,10,10,0.85); border-bottom: 1px solid var(--border); }
+    .logo { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--green-light); }
+    nav>.links { display: flex; gap: 1.5rem; align-items: center; }
+    nav a.link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+    nav a.link:hover { color: var(--text); }
+    .cart-btn { position: relative; display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-card); border: 1px solid var(--border); color: var(--text); padding: 0.5rem 1rem; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 600; font-family: inherit; transition: all 0.2s; }
+    .cart-btn:hover { border-color: var(--green-light); }
+    .cart-count { position: absolute; top: -7px; right: -7px; background: var(--green-light); color: #fff; font-size: 0.7rem; font-weight: 800; border-radius: 100px; padding: 2px 7px; display: none; }
+    .cart-count.show { display: inline-block; }
+    .hero { padding: 4rem 2rem 3rem; text-align: center; position: relative; }
+    .hero::before { content: ''; position: absolute; top: -150px; left: 50%; transform: translateX(-50%); width: 500px; height: 500px; background: radial-gradient(circle, rgba(46,125,50,0.12) 0%, transparent 70%); pointer-events: none; }
+    .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 1rem; border-radius: 100px; border: 1px solid var(--border); background: var(--bg-card); font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; }
+    .hero h1 { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 900; letter-spacing: -2px; line-height: 1.05; margin-bottom: 1rem; background: linear-gradient(135deg, #fff 30%, var(--green-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { color: var(--text-muted); max-width: 520px; margin: 0 auto 1.6rem; font-size: 1.05rem; }
+    .filters { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .filter-chip { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 0.5rem 1.1rem; border-radius: 100px; cursor: pointer; font-size: 0.85rem; font-weight: 600; font-family: inherit; transition: all 0.2s; }
+    .filter-chip:hover { color: var(--text); border-color: var(--green-light); }
+    .filter-chip.active { background: var(--green); color: #fff; border-color: var(--green); }
+    #products { max-width: 1200px; margin: 0 auto; padding: 0 2rem 4rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.4rem; }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s; position: relative; }
+    .card:hover { border-color: var(--green-light); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.35); }
+    .card-img { height: 170px; display: flex; align-items: center; justify-content: center; font-size: 64px; position: relative; }
+    .card-sold { position: absolute; top: 12px; left: 12px; background: rgba(239,68,68,0.9); color: #fff; padding: 4px 10px; border-radius: 100px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; }
+    .card-body { padding: 1.1rem; display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
+    .card-cat { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cyan); }
+    .card-title { font-size: 1.05rem; font-weight: 700; line-height: 1.3; }
+    .card-desc { color: var(--text-muted); font-size: 0.85rem; flex: 1; }
+    .card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 0.6rem; }
+    .card-price { font-size: 1.2rem; font-weight: 800; color: var(--green-light); }
+    .card-price .was { color: var(--text-muted); font-size: 0.85rem; font-weight: 500; text-decoration: line-through; margin-left: 0.4rem; }
+    .add-btn { background: var(--green); color: #fff; border: none; padding: 0.55rem 1rem; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .add-btn:hover { background: var(--green-light); }
+    .add-btn.disabled { background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border); cursor: not-allowed; }
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--green); color: #fff; padding: 0.8rem 1.4rem; border-radius: 12px; font-weight: 600; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 200; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 300; }
+    .overlay.show { opacity: 1; pointer-events: auto; }
+    .cart { position: fixed; top: 0; right: -420px; width: 100%; max-width: 400px; height: 100vh; background: var(--bg-card); border-left: 1px solid var(--border); z-index: 400; transition: right 0.3s ease; display: flex; flex-direction: column; }
+    .cart.open { right: 0; }
+    .cart-head { display: flex; align-items: center; justify-content: space-between; padding: 1.3rem 1.4rem; border-bottom: 1px solid var(--border); }
+    .cart-head h2 { font-size: 1.1rem; font-weight: 800; }
+    .close-x { background: none; border: none; color: var(--text-muted); font-size: 1.6rem; cursor: pointer; line-height: 1; }
+    .close-x:hover { color: var(--text); }
+    .cart-body { flex: 1; overflow-y: auto; padding: 1rem 1.4rem; display: flex; flex-direction: column; gap: 0.8rem; }
+    .cart-empty { text-align: center; color: var(--text-muted); padding: 3rem 0; font-size: 0.95rem; }
+    .cart-item { display: flex; gap: 0.8rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; padding: 0.7rem; }
+    .cart-item .ci-emoji { font-size: 34px; display: flex; align-items: center; }
+    .cart-item .ci-info { flex: 1; display: flex; flex-direction: column; gap: 0.2rem; }
+    .ci-name { font-weight: 700; font-size: 0.95rem; }
+    .ci-price { color: var(--green-light); font-weight: 700; font-size: 0.9rem; }
+    .ci-qty { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.3rem; }
+    .qty-btn { width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font-size: 1rem; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center; }
+    .qty-btn:hover { border-color: var(--green-light); }
+    .ci-quantity { font-size: 0.9rem; font-weight: 600; min-width: 20px; text-align: center; }
+    .ci-remove { background: none; border: none; color: var(--red, #EF4444); cursor: pointer; font-size: 0.78rem; font-weight: 600; align-self: flex-start; }
+    .cart-foot { padding: 1.2rem 1.4rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.6rem; }
+    .cart-total { display: flex; justify-content: space-between; font-weight: 800; font-size: 1.15rem; }
+    .checkout-btn { background: linear-gradient(135deg, var(--green), var(--cyan)); color: #fff; border: none; padding: 1rem; border-radius: 14px; font-weight: 800; font-size: 1rem; cursor: pointer; font-family: inherit; transition: transform 0.2s; }
+    .checkout-btn:hover { transform: translateY(-2px); }
+    .note { font-size: 0.75rem; color: var(--text-muted); text-align: center; }
+    section { padding: 2rem; }
+    footer { text-align: center; padding: 2.5rem 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+    footer a { color: var(--green-light); text-decoration: none; }
+    @media (max-width: 640px) { nav { padding: 0.9rem 1.1rem; } .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; } .card-img { height: 120px; font-size: 48px; } .hero { padding: 3rem 1.2rem 2rem; } }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="logo" href="index.html">Kaplun<span>Store</span></a>
+    <div class="links">
+      <a class="link" href="index.html">CalorieTracker</a>
+      <button class="cart-btn" onclick="openCart()">Cart <span id="cartCount" class="cart-count">0</span></button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="badge"><div style="width:8px;height:8px;background:var(--green-light);border-radius:50%;"></div>Curated reselling store</div>
+    <h1>Fresh finds. Fair prices.</h1>
+    <p>Hand-picked items listed for resale. Add to cart, check out via message, and we'll sort out the details.</p>
+    <div class="filters" id="filters"></div>
+  </div>
+
+  <section id="products">
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+  <div class="overlay" id="overlay" onclick="closeCart()"></div>
+
+  <div class="cart" id="cart">
+    <div class="cart-head">
+      <h2>Your Cart</h2>
+      <button class="close-x" onclick="closeCart()">&times;</button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-foot">
+      <div class="cart-total"><span>Total</span><span id="cartTotal">$0</span></div>
+      <button class="checkout-btn" id="checkoutBtn" onclick="checkout()">Checkout via Message</button>
+      <div class="note">No online payments. You'll receive the order by email/WhatsApp.</div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; <span id="year"></span> Kaplun Store. Built for reselling. &middot; <a href="index.html">CalorieTracker App</a>
+  </footer>
+
+  <script>
+    var PRODUCTS = [
+      { id: 1, title: "Limited Edition Sneakers", cat: "Sneakers", price: 89, was: 140, emoji: "\u{1F45F}", img: "linear-gradient(135deg,#1e293b,#334155)", desc: "Deadstock, size 10, box included." },
+      { id: 2, title: "Streetwear Hoodie", cat: "Clothing", price: 45, was: 70, emoji: "\u{1F456}", img: "linear-gradient(135deg,#3b0764,#6d28d9)", desc: "Heavyweight fleece, brand new with tags." },
+      { id: 3, title: "Vintage Graphic Tee", cat: "Clothing", price: 25, was: 0, emoji: "\u{1F455}", img: "linear-gradient(135deg,#064e3b,#10b981)", desc: "Rare print, lightly worn, great condition." },
+      { id: 4, title: "Dropshipping Bundle", cat: "Digital", price: 19, was: 49, emoji: "\u{1F4E6}", img: "linear-gradient(135deg,#0c4a6e,#0ea5e9)", desc: "Product research + ads templates for beginners." },
+      { id: 5, title: "Gaming Controller", cat: "Electronics", price: 60, was: 90, emoji: "\u{1F3AE}", img: "linear-gradient(135deg,#581c87,#a21caf)", desc: "Like new, fully tested with warranty." },
+      { id: 6, title: "Ceramic Mug Bundle", cat: "Home", price: 18, was: 0, emoji: "\u{2615}", img: "linear-gradient(135deg,#78350f,#f59e0b)", desc: "Set of 4 minimalist mugs, never used." }
+    ];
+
+    var cart = {};
+    var filters = ["All"];
+    PRODUCTS.forEach(function (p) {
+      if (filters.indexOf(p.cat) === -1) filters.push(p.cat);
+    });
+
+    function renderFilters() {
+      var el = document.getElementById("filters");
+      el.innerHTML = filters.map(function (f, i) {
+        return '<button class="filter-chip' + (i === 0 ? ' active' : '') + '" data-cat="' + f + '">' + f + '</button>';
+      }).join("");
+      el.querySelectorAll(".filter-chip").forEach(function (chip) {
+        chip.addEventListener("click", function () {
+          el.querySelectorAll(".filter-chip").forEach(function (c) { c.classList.remove("active"); });
+          chip.classList.add("active");
+          renderGrid(chip.dataset.cat);
+        });
+      });
+    }
+
+    function money(n) { return "$" + (n ? n.toFixed(2) : "0"); }
+
+    function cardHtml(p) {
+      return '<div class="card">' +
+        '<div class="card-img" style="background:' + p.img + '">' + p.emoji + (p.sold ? '<span class="card-sold">SOLD</span>' : '') + '</div>' +
+        '<div class="card-body">' +
+        '<span class="card-cat">' + p.cat + '</span>' +
+        '<div class="card-title">' + p.title + '</div>' +
+        '<div class="card-desc">' + p.desc + '</div>' +
+        '<div class="card-foot">' +
+        '<span class="card-price">' + money(p.price) + (p.was ? '<span class="was">' + money(p.was) + '</span>' : '') + '</span>' +
+        (p.sold ? '<button class="add-btn disabled">Sold</button>' : '<button class="add-btn" onclick="addToCart(' + p.id + ')">Add</button>') +
+        '</div></div></div>';
+    }
+
+    function renderGrid(cat) {
+      var el = document.getElementById("grid");
+      el.innerHTML = PRODUCTS.filter(function (p) { return cat === "All" || p.cat === cat; }).map(cardHtml).join("");
+    }
+
+    function saveCart() { localStorage.setItem("kaplun_cart", JSON.stringify(cart)); }
+
+    function loadCart() {
+      try { cart = JSON.parse(localStorage.getItem("kaplun_cart")) || {}; } catch (e) { cart = {}; }
+      updateCartUI();
+    }
+
+    function addToCart(id) {
+      cart[id] = (cart[id] || 0) + 1;
+      saveCart(); updateCartUI(); showToast("Added to cart");
+    }
+
+    function changeQty(id, d) {
+      cart[id] = (cart[id] || 0) + d;
+      if (cart[id] <= 0) delete cart[id];
+      saveCart(); updateCartUI();
+    }
+
+    function cartCount() { return Object.keys(cart).reduce(function (s, k) { return s + cart[k]; }, 0); }
+
+    function cartTotal() {
+      return Object.keys(cart).reduce(function (s, k) {
+        var p = PRODUCTS.find(function (x) { return x.id === Number(k); });
+        return s + (p ? p.price * cart[k] : 0);
+      }, 0);
+    }
+
+    function updateCartUI() {
+      var n = cartCount();
+      var badge = document.getElementById("cartCount");
+      badge.textContent = n; badge.className = "cart-count" + (n ? " show" : "");
+      document.getElementById("cartTotal").textContent = money(cartTotal());
+
+      var keys = Object.keys(cart);
+      var body = document.getElementById("cartBody");
+      if (!keys.length) {
+        body.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
+        return;
+      }
+      body.innerHTML = keys.map(function (k) {
+        var p = PRODUCTS.find(function (x) { return x.id === Number(k); });
+        if (!p) return "";
+        return '<div class="cart-item">' +
+          '<div class="ci-emoji">' + p.emoji + '</div>' +
+          '<div class="ci-info">' +
+          '<span class="ci-name">' + p.title + '</span>' +
+          '<span class="ci-price">' + money(p.price) + '</span>' +
+          '<div class="ci-qty">' +
+          '<button class="qty-btn" onclick="changeQty(' + p.id + ',-1)">-</button>' +
+          '<span class="ci-quantity">' + cart[k] + '</span>' +
+          '<button class="qty-btn" onclick="changeQty(' + p.id + ',1)">+</button>' +
+          '</div></div>' +
+          '<button class="ci-remove" onclick="changeQty(' + p.id + ',-999)">Remove</button>' +
+          '</div>';
+      }).join("");
+    }
+
+    function openCart() {
+      document.getElementById("cart").classList.add("open");
+      document.getElementById("overlay").classList.add("show");
+    }
+
+    function closeCart() {
+      document.getElementById("cart").classList.remove("open");
+      document.getElementById("overlay").classList.remove("show");
+    }
+
+    function checkout() {
+      var keys = Object.keys(cart);
+      if (!keys.length) { showToast("Cart is empty"); return; }
+      var lines = keys.map(function (k) {
+        var p = PRODUCTS.find(function (x) { return x.id === Number(k); });
+        return "  - " + p.title + " x" + cart[k] + " (" + money(p.price * cart[k]) + ")";
+      }).join("\n");
+      var subject = encodeURIComponent("Order request from Kaplun Store");
+      var body = encodeURIComponent("Hi, I'd like to order:\n" + lines + "\n\nTotal: " + money(cartTotal()));
+      window.location.href = "mailto:kaplunstore@example.com?subject=" + subject + "&body=" + body;
+      showToast("Opening your email app...");
+    }
+
+    var toastTimer;
+    function showToast(msg) {
+      var t = document.getElementById("toast");
+      t.textContent = msg; t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2200);
+    }
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+    renderFilters();
+    renderGrid("All");
+    loadCart();
+  </script>
+</body>
+</html>
