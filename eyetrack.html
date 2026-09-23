@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaplun EyeTrack - Webcam Eye Tracking</title>
+<style>
+  :root { --accent: #00d4a0; --bg: #0b0f14; }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { background: var(--bg); color: #e6edf3; min-height: 100vh; }
+  header { padding: 18px 24px; border-bottom: 1px solid #1c2733; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 18px; letter-spacing: .5px; }
+  header .dot { width: 10px; height: 10px; border-radius: 50%; background: #555; transition: background .2s; }
+  header .dot.live { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+  main { display: flex; gap: 20px; padding: 20px; flex-wrap: wrap; }
+  .stage { flex: 1 1 520px; min-width: 320px; }
+  .video-wrap { position: relative; border-radius: 14px; overflow: hidden; background: #000; aspect-ratio: 16/9; border: 1px solid #1c2733; }
+  video, canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  video { transform: scaleX(-1); object-fit: cover; }
+  .hud { flex: 0 1 340px; display: flex; flex-direction: column; gap: 16px; }
+  .card { background: #121a22; border: 1px solid #1c2733; border-radius: 12px; padding: 16px; }
+  .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #8aa2b9; margin-bottom: 10px; }
+  .gaze-dir { display: flex; gap: 8px; flex-wrap: wrap; }
+  .dir { flex: 1; min-width: 70px; text-align: center; padding: 10px 4px; border-radius: 8px; background: #0d141b; border: 1px solid #1c2733; font-weight: 700; color: #5d7287; font-size: 14px; }
+  .dir.on { background: rgba(0,212,160,.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 12px rgba(0,212,160,.25); }
+  .radar { position: relative; width: 100%; aspect-ratio: 1; background:
+      linear-gradient(#1c2733 1px, transparent 1px) 0 0/25% 25%,
+      linear-gradient(90deg, #1c2733 1px, transparent 1px) 0 0/25% 25%,
+      radial-gradient(circle at center, #0d141b 0%, #121a22 100%); border-radius: 12px; border: 1px solid #1c2733; }
+  .ret { position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); transform: translate(-50%, -50%); box-shadow: 0 0 14px var(--accent); transition: left .08s linear, top .08s linear; }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat { background: #0d141b; border: 1px solid #1c2733; border-radius: 8px; padding: 10px; }
+  .stat .lbl { font-size: 11px; color: #8aa2b9; text-transform: uppercase; letter-spacing: 1px; }
+  .stat .val { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .stat .val.blink { color: #ff5d5d; }
+  #msg { padding: 20px; text-align: center; color: #ffb3a7; display: none; }
+  footer { padding: 12px 24px; color: #5d7287; font-size: 12px; }
+  .perm { text-align: center; padding: 12px; color: #8aa2b9; }
+</style>
+</head>
+<body>
+<header>
+  <span class="dot" id="statusDot"></span>
+  <h1>Kaplun EyeTrack</h1>
+  <span id="statusText" class="perm">waiting for camera...</span>
+</header>
+
+<main>
+  <div class="stage">
+    <div class="video-wrap">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="overlay"></canvas>
+    </div>
+    <div class="perm">Webcam is mirrored (like a mirror). Blink to test detection. Gaze = where you look.</div>
+  </div>
+
+  <div class="hud">
+    <div class="card">
+      <h2>Gaze Direction</h2>
+      <div class="gaze-dir" id="gazeDirs">
+        <div class="dir" data-d="left">LEFT</div>
+        <div class="dir" data-d="up">UP</div>
+        <div class="dir" data-d="center">CENTER</div>
+        <div class="dir" data-d="down">DOWN</div>
+        <div class="dir" data-d="right">RIGHT</div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Gaze Radar (mirrored)</h2>
+      <div class="radar"><div class="ret" id="ret"></div></div>
+    </div>
+    <div class="card">
+      <h2>Live Stats</h2>
+      <div class="stats">
+        <div class="stat"><div class="lbl">Gaze X</div><div class="val" id="gx">0.00</div></div>
+        <div class="stat"><div class="lbl">Gaze Y</div><div class="val" id="gy">0.00</div></div>
+        <div class="stat"><div class="lbl">Focus</div><div class="val" id="focus">-</div></div>
+        <div class="stat"><div class="lbl">Blink</div><div class="val blink" id="blink">none</div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="msg"></div>
+<footer>Runs 100% in your browser. No video leaves your device. Uses MediaPipe FaceMesh.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14"></script>
+<script>
+(async () => {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('overlay');
+  const ctx = canvas.getContext('2d');
+  const dots = { up: null, down: null, left: null, right: null, center: null };
+  document.querySelectorAll('.dir').forEach(el => dots[el.dataset.d] = el);
+
+  let smooth = { x: 0, y: 0 };
+
+  // --- MediaPipe setup ---
+  const vision = await FilesetResolver.forVisionTasks(
+    'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+  );
+  const landmarker = await FaceLandmarker.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+      delegate: 'GPU'
+    },
+    outputFaceBlendshapes: false,
+    outputFacialTransformationMatrixes: false,
+    numFaces: 1
+  });
+
+  function setStatus(text, live) {
+    document.getElementById('statusText').textContent = text;
+    document.getElementById('statusDot').classList.toggle('live', live);
+  }
+
+  // --- start camera ---
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+      audio: false
+    });
+    video.srcObject = stream;
+    await video.play();
+    setStatus('TRACKING', true);
+  } catch (e) {
+    document.getElementById('msg').style.display = 'block';
+    document.getElementById('msg').textContent =
+      'Camera blocked or unavailable. Allow camera access (HTTPS or localhost/file is required). Error: ' + e.message;
+    setStatus('camera error', false);
+    return;
+  }
+
+  // --- rendering loop ---
+  function resizeCanvas() {
+    const r = canvas.getBoundingClientRect();
+    if (canvas.width !== Math.round(r.width) || canvas.height !== Math.round(r.height)) {
+      canvas.width = r.width; canvas.height = r.height;
+    }
+  }
+
+  async function loop() {
+    resizeCanvas();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.scale(-1, 1); // mirror like the video
+    ctx.translate(-canvas.width, 0);
+
+    let gaze = null;
+    const res = landmarker.detectForVideo(video, performance.now());
+    if (res.faceLandmarks && res.faceLandmarks.length > 0) {
+      const lm = res.faceLandmarks[0];
+      // landmark indices (478-model): eyes + iris
+      // right eye (subject): corners 33 & 133, iris 468; left eye: corners 362 & 263, iris 473
+      const R = { c1: lm[33], c2: lm[133], iris: lm[468] };
+      const L = { c1: lm[263], c2: lm[362], iris: lm[473] };
+      // average of the 5 iris points for stability
+      for (const idx of [469,470,471,472]) { R.iris.x += lm[idx].x / 5; R.iris.y += lm[idx].y / 5; }
+      for (const idx of [474,475,476,477]) { L.iris.x += lm[idx].x / 5; L.iris.y += lm[idx].y / 5; }
+
+      function eyeGaze(e) {
+        const w = Math.abs(e.c2.x - e.c1.x) || 1e-6;
+        const cx = (e.c1.x + e.c2.x) / 2, cy = (e.c1.y + e.c2.y) / 2;
+        return { x: (e.iris.x - cx) / w, y: (e.iris.y - cy) / w };
+      }
+      const gR = eyeGaze(R), gL = eyeGaze(L);
+      gaze = { x: (gR.x + gL.x) / 2, y: (gR.y + gL.y) / 2 };
+
+      // blink (EAR): upper/lower lid distances vs eye width
+      function realEAR(upper1, lower1, upper2, lower2, c1, c2) {
+        const a = Math.hypot(lm[upper1].x - lm[lower1].x, lm[upper1].y - lm[lower1].y);
+        const b = Math.hypot(lm[upper2].x - lm[lower2].x, lm[upper2].y - lm[lower2].y);
+        const c = Math.hypot(lm[c1].x - lm[c2].x, lm[c1].y - lm[c2].y) || 1e-6;
+        return (a + b) / (2 * c);
+      }
+      const earR = realEAR(159, 145, 158, 153, 33, 133);
+      const earL = realEAR(386, 374, 385, 380, 362, 263);
+      const earAvg = (earR + earL) / 2;
+      document.getElementById('blink').textContent = earAvg < 0.22 ? 'BLINK' : 'eyes open';
+      document.getElementById('blink').style.color = earAvg < 0.22 ? '#ff5d5d' : '#00d4a0';
+
+      // draw tracked eyes
+      ctx.fillStyle = 'rgba(0,212,160,0.9)';
+      const px = (p) => [p.x * canvas.width, p.y * canvas.height];
+      for (const p of [R.c1, R.c2, L.c1, L.c2]) {
+        const [x, y] = px(p); ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
+      }
+      ctx.strokeStyle = 'rgba(0,212,160,0.75)'; ctx.lineWidth = 2;
+      for (const tc of [[33,133],[362,263]]) {
+        ctx.beginPath();
+        ctx.moveTo(lm[tc[0]].x * canvas.width, lm[tc[0]].y * canvas.height);
+        ctx.lineTo(lm[tc[1]].x * canvas.width, lm[tc[1]].y * canvas.height);
+        ctx.stroke();
+      }
+      // iris
+      ctx.fillStyle = '#ffe763';
+      const [ix, iy] = px(R.iris); ctx.beginPath(); ctx.arc(ix, iy, 4, 0, Math.PI*2); ctx.fill();
+      const [ix2, iy2] = px(L.iris); ctx.beginPath(); ctx.arc(ix2, iy2, 4, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+
+    // --- update HUD ---
+    if (gaze) {
+      // squash the fair range (limits ~ +/-0.12) to [-1..1]
+      const rx = Math.max(-1, Math.min(1, gaze.x / 0.14));
+      const ry = Math.max(-1, Math.min(1, gaze.y / 0.14));
+      smooth.x += (rx - smooth.x) * 0.25;
+      smooth.y += (ry - smooth.y) * 0.25;
+      document.getElementById('gx').textContent = smooth.x.toFixed(2);
+      document.getElementById('gy').textContent = smooth.y.toFixed(2);
+
+      // radar dot (mirrored frame like the video: vx = -smooth.x)
+      const vx = -smooth.x, vy = smooth.y;
+      const ret = document.getElementById('ret');
+      const radar = ret.parentElement;
+      const cxr = radar.clientWidth / 2, cyr = radar.clientHeight / 2;
+      ret.style.left = (cxr + vx * cxr * 0.8) + 'px';
+      ret.style.top = (cyr + vy * cyr * 0.8) + 'px';
+
+      // direction labels (mirrored view)
+      const dirs = document.querySelectorAll('.dir');
+      dirs.forEach(d => d.classList.remove('on'));
+      const thr = 0.35;
+      if (Math.abs(vx) < thr && Math.abs(vy) < thr) dots.center.classList.add('on');
+      if (vx > thr) dots.right.classList.add('on');
+      if (vx < -thr) dots.left.classList.add('on');
+      if (vy > thr) dots.down.classList.add('on');
+      if (vy < -thr) dots.up.classList.add('on');
+
+      const det = Math.hypot(smooth.x, smooth.y);
+      document.getElementById('focus').textContent = det < 0.2 ? 'LOCKED' : det < 0.5 ? 'WANDERING' : 'ROAMING';
+      document.getElementById('focus').style.color = det < 0.2 ? '#00d4a0' : det < 0.5 ? '#ffd166' : '#ff5d5d';
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+</script>
+</body>
+</html>
