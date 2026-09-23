@@ -94,7 +94,7 @@
   </nav>
 
   <div class="hero">
-    <div class="badge"><div style="width:8px;height:8px;background:var(--green-light);border-radius:50%;"></div>Genuine pre-owned electronics</div>
+    <div class="badge"><div style="width:8px;height:8px;background:var(--green-light);border-radius:50%;"></div>Genuine pre-owned electronics &middot; Pay via Ko-fi</div>
     <h1>Tested. Cleaned. Ready to game.</h1>
     <p>Genuine used consoles, phones, and audio gear from Sony, Apple, Samsung &amp; more. Every item is tested and honestly rated by condition.</p>
     <div class="filters" id="filters"></div>
@@ -115,13 +115,13 @@
     <div class="cart-body" id="cartBody"></div>
     <div class="cart-foot">
       <div class="cart-total"><span>Total</span><span id="cartTotal">$0</span></div>
-      <button class="checkout-btn" id="checkoutBtn" onclick="checkout()">Checkout via Message</button>
-      <div class="note">No online payments. You'll receive the order by email/WhatsApp.</div>
+      <button class="checkout-btn" id="checkoutBtn" onclick="checkout()">Pay on Ko-fi + Order</button>
+      <div class="note">1. Donate the total on Ko-fi &middot; 2. Send the order email &middot; 3. We confirm &amp; ship</div>
     </div>
   </div>
 
   <footer>
-    &copy; <span id="year"></span> Kaplun Store. Built for reselling. &middot; <a href="index.html">CalorieTracker App</a>
+    &copy; <span id="year"></span> Kaplun Store. Built for reselling. &middot; <a href="index.html">CalorieTracker App</a> &middot; <a href="https://ko-fi.com/kaplun" target="_blank">Ko-fi</a>
   </footer>
 
   <script>
@@ -145,6 +145,8 @@
       { id: 17, title: "Echo Dot 5th Gen (2-pack)", cat: "Smart Home", brand: "Amazon", price: 40, was: 100, cond: "Like New", condClass: "cond-wear-mint", emoji: "\u{1F4FA}", img: "linear-gradient(135deg,#7c2d12,#431407)", desc: "Genuine Amazon, unopened, smart speaker pair." },
       { id: 18, title: "PS4 Slim 1TB + 2 games", cat: "Consoles", brand: "Sony", price: 180, was: 300, cond: "Good", condClass: "cond-wear-light", emoji: "\u{1F3AE}", img: "linear-gradient(135deg,#0f172a,#334155)", desc: "Runs quiet, includes controller + 2 free games." }
     ];
+
+    var KOFI = "https://ko-fi.com/kaplun";
 
     var cart = {};
     var filters = ["All"];
@@ -263,9 +265,10 @@
         return "  - " + p.title + " x" + cart[k] + " (" + money(p.price * cart[k]) + ")";
       }).join("\n");
       var subject = encodeURIComponent("Order request from Kaplun Store");
-      var body = encodeURIComponent("Hi, I'd like to order:\n" + lines + "\n\nTotal: " + money(cartTotal()));
+      var body = encodeURIComponent("Hi, I'd like to order:\n" + lines + "\n\nTotal to donate: " + money(cartTotal()) + "\n\n(Making the Ko-fi donation now.)");
+      window.open(KOFI, "_blank");
       window.location.href = "mailto:danielkaplun898@gmail.com?subject=" + subject + "&body=" + body;
-      showToast("Opening your email app...");
+      showToast("Opened Ko-fi for payment + your email for the order...");
     }
 
     var toastTimer;
