@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaplunBuds - Wireless Earbuds</title>
+  <meta name="description" content="KaplunBuds wireless earbuds - 10mm drivers, Bluetooth 5.4, 30h battery life. Buy via Ko-fi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --green: #2E7D32; --green-light: #4CAF50; --bg: #0a0a0a; --bg-card: #141414; --text: #fff; --text-muted: #888; --border: #222; --cyan: #06B6D4; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+    nav { position: sticky; top: 0; width: 100%; z-index: 100; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(20px); background: rgba(10,10,10,0.85); border-bottom: 1px solid var(--border); }
+    .logo { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--green-light); }
+    nav>.links { display: flex; gap: 1.5rem; align-items: center; }
+    nav a.link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+    nav a.link:hover { color: var(--text); }
+    .hero { min-height: 86vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 6rem 2rem 4rem; position: relative; }
+    .hero::before { content: ''; position: absolute; top: -220px; left: 50%; transform: translateX(-50%); width: 700px; height: 700px; background: radial-gradient(circle, rgba(46,125,50,0.14) 0%, transparent 70%); pointer-events: none; }
+    .badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 1rem; border-radius: 100px; border: 1px solid var(--border); background: var(--bg-card); font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.4rem; }
+    .badge .dot { width: 8px; height: 8px; background: var(--green-light); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .hero h1 { font-size: clamp(2.6rem, 7vw, 5rem); font-weight: 900; letter-spacing: -2.5px; line-height: 1; margin-bottom: 1.2rem; background: linear-gradient(135deg, #fff 30%, var(--green-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { color: var(--text-muted); max-width: 520px; font-size: 1.1rem; margin-bottom: 2rem; }
+    .buds-art { margin-bottom: 2rem; position: relative; }
+    .buds { width: 260px; height: 260px; }
+    @keyframes float { 0%,100% { transform: translateY(0) rotate(-8deg); } 50% { transform: translateY(-16px) rotate(-8deg); } }
+    .left-bud { animation: float 4s ease-in-out infinite; }
+    @keyframes float2 { 0%,100% { transform: translateY(-10px) rotate(8deg); } 50% { transform: translateY(6px) rotate(8deg); } }
+    .right-bud { animation: float2 4.2s ease-in-out infinite; }
+    .grab { display: inline-flex; align-items: center; gap: 0.7rem; padding: 1rem 2.2rem; border-radius: 14px; font-size: 1.05rem; font-weight: 800; text-decoration: none; color: #fff; background: linear-gradient(135deg, var(--green), var(--cyan)); transition: all 0.2s; }
+    .grab:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(6,182,212,0.3); }
+    .price-line { color: var(--text-muted); margin-top: 1.2rem; font-size: 0.95rem; }
+    .price-line strong { color: var(--green-light); font-size: 1.3rem; }
+    .price-line .was { text-decoration: line-through; color: var(--text-muted); }
+    section { padding: 4rem 2rem; max-width: 1100px; margin: 0 auto; }
+    .section-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--green-light); margin-bottom: 0.8rem; }
+    .section-heading { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 2rem; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.4rem; }
+    .feature { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 1.6rem; transition: all 0.3s; }
+    .feature:hover { border-color: var(--green-light); transform: translateY(-4px); }
+    .feature .ic { font-size: 30px; margin-bottom: 0.8rem; }
+    .feature h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .feature p { color: var(--text-muted); font-size: 0.88rem; }
+    .specs { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .specs td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+    .specs td:first-child { color: var(--text-muted); width: 38%; font-weight: 600; }
+    .specs tr:hover { background: rgba(255,255,255,0.02); }
+    .buy { text-align: center; }
+    .buy-card { background: linear-gradient(135deg, rgba(46,125,50,0.08), rgba(6,182,212,0.05)); border: 1px solid rgba(46,125,50,0.3); border-radius: 24px; padding: 3.5rem 2rem; position: relative; overflow: hidden; }
+    .buy-card h2 { font-size: 2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 1rem; }
+    .buy-card p { color: var(--text-muted); margin-bottom: 1.8rem; }
+    .how-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.4rem; margin-top: 2.4rem; text-align: center; }
+    .step .num { width: 34px; height: 34px; border-radius: 50%; background: var(--green); color: #fff; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.7rem; }
+    .step h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .step p { color: var(--text-muted); font-size: 0.85rem; }
+    footer { text-align: center; padding: 2.5rem 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+    footer a { color: var(--green-light); text-decoration: none; }
+    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--green); color: #fff; padding: 0.8rem 1.4rem; border-radius: 12px; font-weight: 600; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 200; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (max-width: 640px) { nav { padding: 0.9rem 1.1rem; } .hero { padding: 4rem 1.2rem 2rem; } .buds { width: 200px; height: 200px; } }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="logo" href="index.html">Kaplun<span>Buds</span></a>
+    <div class="links">
+      <a class="link" href="index.html">CalorieTracker</a>
+      <a class="link" href="store.html">Store</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="buds-art">
+      <svg class="buds left-bud" viewBox="0 0 100 100" width="130" height="130" style="position:absolute;left:-160px;top:10px;"><circle cx="50" cy="50" r="46" fill="#111" stroke="#333" stroke-width="4"/><circle cx="50" cy="38" r="12" fill="#1a1a1a" stroke="#2E7D32" stroke-width="2"/></svg>
+      <svg class="buds right-bud" viewBox="0 0 100 100" width="130" height="130" style="position:absolute;right:-160px;top:10px;"><circle cx="50" cy="50" r="46" fill="#111" stroke="#333" stroke-width="4"/><circle cx="50" cy="38" r="12" fill="#1a1a1a" stroke="#06B6D4" stroke-width="2"/></svg>
+      <svg class="buds" viewBox="0 0 320 260" width="240" height="200"><ellipse cx="160" cy="210" rx="118" ry="34" fill="#141414" stroke="#333" stroke-width="3"/><ellipse cx="160" cy="196" rx="100" ry="26" fill="#0d0d0d" stroke="#222" stroke-width="2"/><path d="M95 160 l12 -70 l6 -30 l54 -18 l54 18 l6 30 l12 70 z" fill="#1a1a1a" stroke="#2E7D32" stroke-width="3"/><line x1="160" y1="60" x2="160" y2="40" stroke="#2E7D32" stroke-width="4" stroke-linecap="round"/><circle cx="160" cy="52" r="4" fill="#06B6D4"/></svg>
+    </div>
+    <div class="badge"><div class="dot"></div>Sound designed for everyday listening</div>
+    <h1>KaplunBuds</h1>
+    <p>10mm dynamic drivers, Bluetooth 5.4, and 30 hours of battery. Small earbuds, big sound.</p>
+    <div class="price-line"><strong>$29</strong> <span class="was">$60</span> &middot; free shipping</div>
+    <div style="height:1.2rem"></div>
+    <a class="grab" href="#" onclick="buyNow(); return false;">Get a Pair</a>
+  </div>
+
+  <section id="features">
+    <div class="section-title">Why you'll like them</div>
+    <h2 class="section-heading">Big sound, tiny earbuds</h2>
+    <div class="features">
+      <div class="feature"><div class="ic">🎶</div><h3>Rich 10mm Drivers</h3><p>Punchy bass and clear vocals without the distortion you get on cheap earbuds.</p></div>
+      <div class="feature"><div class="ic">🔋</div><h3>30h Total Battery</h3><p>6h per charge, plus 5 more charges in the pocket-sized case. USB-C fast charging.</p></div>
+      <div class="feature"><div class="ic">🎤</div><h3>Clear Calls</h3><p>Dual ENC microphones filter background noise so you sound sharp on calls.</p></div>
+      <div class="feature"><div class="ic">💧</div><h3>IPX5 Sweatproof</h3><p>Rain and gym sessions are fine. Toughened for daily carry.</p></div>
+      <div class="feature"><div class="ic">⚡</div><h3>Bluetooth 5.4</h3><p>Instant pairing, rock-solid range, and low latency for video.</p></div>
+      <div class="feature"><div class="ic">🤏</div><h3>Feather-Light</h3><p>3.6g per bud. You'll forget you're wearing them.</p></div>
+    </div>
+  </section>
+
+  <section id="specs">
+    <div class="section-title">Tech Specs</div>
+    <h2 class="section-heading">What's under the hood</h2>
+    <table class="specs">
+      <tr><td>Driver</td><td>10mm dynamic, copper-clad voice coil</td></tr>
+      <tr><td>Bluetooth</td><td>5.4, A2DP / AVRCP / HFP</td></tr>
+      <tr><td>Codecs</td><td>SBC, AAC</td></tr>
+      <tr><td>Battery (buds)</td><td>6h per charge</td></tr>
+      <tr><td>Battery (case)</td><td>400mAh, 4 extra charges (24h total)</td></tr>
+      <tr><td>Charging</td><td>USB-C, ~1.5h full charge</td></tr>
+      <tr><td>Water resistance</td><td>IPX5</td></tr>
+      <tr><td>Mics</td><td>Dual ENC per bud for calls</td></tr>
+      <tr><td>Weight</td><td>3.6g per earbud, 38g with case</td></tr>
+      <tr><td>Controls</td><td>Touch: play, skip, call, voice assistant</td></tr>
+      <tr><td>Colors</td><td>Matte Black, Sage Green, Cloud White</td></tr>
+    </table>
+  </section>
+
+  <section class="buy" id="buy">
+    <div class="buy-card">
+      <div class="section-title">Order</div>
+      <h2>Get your KaplunBuds</h2>
+      <p>Pay by Ko-fi donation, then confirm your order by email.</p>
+      <a class="grab" href="#" onclick="buyNow(); return false;">Buy Now - $29</a>
+      <div class="how-steps">
+        <div class="step"><div class="num">1</div><h4>Donate $29 on Ko-fi</h4><p>Opens ko-fi.com/kaplun - use the amount shown.</p></div>
+        <div class="step"><div class="num">2</div><h4>Send Order Email</h4><p>Your email opens pre-filled with your earbuds order.</p></div>
+        <div class="step"><div class="num">3</div><h4>We Ship</h4><p>We confirm your donation and send them out.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+
+  <footer>
+    &copy; <span id="year"></span> Kaplun. <a href="index.html">CalorieTracker App</a> &middot; <a href="store.html">Store</a> &middot; <a href="https://ko-fi.com/kaplun" target="_blank">Ko-fi</a>
+  </footer>
+
+  <script>
+    var KOFI = "https://ko-fi.com/kaplun";
+    function buyNow() {
+      var subject = encodeURIComponent("KaplunBuds order");
+      var body = encodeURIComponent("Hi, I'd like to order one pair of KaplunBuds ($29). Making the Ko-fi donation now.\n\nColor: ");
+      window.open(KOFI, "_blank");
+      window.location.href = "mailto:danielkaplun898@gmail.com?subject=" + subject + "&body=" + body;
+      showToast("Opened Ko-fi for payment + your order email...");
+    }
+    var toastTimer;
+    function showToast(msg) {
+      var t = document.getElementById("toast");
+      t.textContent = msg; t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { t.classList.remove("show"); }, 2400);
+    }
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
