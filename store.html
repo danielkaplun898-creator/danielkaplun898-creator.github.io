@@ -37,6 +37,9 @@
     .card:hover { border-color: var(--green-light); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.35); }
     .card-img { height: 170px; display: flex; align-items: center; justify-content: center; font-size: 64px; position: relative; }
     .card-sold { position: absolute; top: 12px; left: 12px; background: rgba(239,68,68,0.9); color: #fff; padding: 4px 10px; border-radius: 100px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; }
+    .card-cond { position: absolute; top: 12px; right: 12px; padding: 4px 10px; border-radius: 100px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; }
+    .cond-wear-mint { background: rgba(52,211,153,0.16); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.35); }
+    .cond-wear-light { background: rgba(250,204,21,0.14); color: #fde047; border: 1px solid rgba(250,204,21,0.35); }
     .card-body { padding: 1.1rem; display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
     .card-cat { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--cyan); }
     .card-title { font-size: 1.05rem; font-weight: 700; line-height: 1.3; }
@@ -91,9 +94,9 @@
   </nav>
 
   <div class="hero">
-    <div class="badge"><div style="width:8px;height:8px;background:var(--green-light);border-radius:50%;"></div>Curated reselling store</div>
-    <h1>Fresh finds. Fair prices.</h1>
-    <p>Hand-picked items listed for resale. Add to cart, check out via message, and we'll sort out the details.</p>
+    <div class="badge"><div style="width:8px;height:8px;background:var(--green-light);border-radius:50%;"></div>Genuine pre-owned electronics</div>
+    <h1>Tested. Cleaned. Ready to game.</h1>
+    <p>Genuine used consoles, phones, and audio gear from Sony, Apple, Samsung &amp; more. Every item is tested and honestly rated by condition.</p>
     <div class="filters" id="filters"></div>
   </div>
 
@@ -123,12 +126,14 @@
 
   <script>
     var PRODUCTS = [
-      { id: 1, title: "Limited Edition Sneakers", cat: "Sneakers", price: 89, was: 140, emoji: "\u{1F45F}", img: "linear-gradient(135deg,#1e293b,#334155)", desc: "Deadstock, size 10, box included." },
-      { id: 2, title: "Streetwear Hoodie", cat: "Clothing", price: 45, was: 70, emoji: "\u{1F456}", img: "linear-gradient(135deg,#3b0764,#6d28d9)", desc: "Heavyweight fleece, brand new with tags." },
-      { id: 3, title: "Vintage Graphic Tee", cat: "Clothing", price: 25, was: 0, emoji: "\u{1F455}", img: "linear-gradient(135deg,#064e3b,#10b981)", desc: "Rare print, lightly worn, great condition." },
-      { id: 4, title: "Dropshipping Bundle", cat: "Digital", price: 19, was: 49, emoji: "\u{1F4E6}", img: "linear-gradient(135deg,#0c4a6e,#0ea5e9)", desc: "Product research + ads templates for beginners." },
-      { id: 5, title: "Gaming Controller", cat: "Electronics", price: 60, was: 90, emoji: "\u{1F3AE}", img: "linear-gradient(135deg,#581c87,#a21caf)", desc: "Like new, fully tested with warranty." },
-      { id: 6, title: "Ceramic Mug Bundle", cat: "Home", price: 18, was: 0, emoji: "\u{2615}", img: "linear-gradient(135deg,#78350f,#f59e0b)", desc: "Set of 4 minimalist mugs, never used." }
+      { id: 1, title: "PS5 Disc Edition", cat: "Consoles", brand: "Sony", price: 340, was: 499, cond: "Excellent", condClass: "cond-wear-mint", emoji: "\u{1F3AE}", img: "linear-gradient(135deg,#1e3a8a,#0f172a)", desc: "Tested & cleaned. Includes controller, cables, box." },
+      { id: 2, title: "Xbox Series X", cat: "Consoles", brand: "Microsoft", price: 330, was: 499, cond: "Good", condClass: "cond-wear-light", emoji: "\u{1F3AE}", img: "linear-gradient(135deg,#064e3b,#022c22)", desc: "Fully working. Light wear, 1TB SSD, controller incl." },
+      { id: 3, title: "Nintendo Switch OLED", cat: "Consoles", brand: "Nintendo", price: 230, was: 349, cond: "Like New", condClass: "cond-wear-mint", emoji: "\u{1F3AE}", img: "linear-gradient(135deg,#b91c1c,#450a0a)", desc: "Barely used. No scratches, dock + joy-cons included." },
+      { id: 4, title: "iPhone 13 128GB Unlocked", cat: "Phones", brand: "Apple", price: 380, was: 600, cond: "Excellent", condClass: "cond-wear-mint", emoji: "\u{1F4F1}", img: "linear-gradient(135deg,#0c4a6e,#155e75)", desc: "Battery 88%, Face ID works, unlocked, new case." },
+      { id: 5, title: "Samsung Galaxy S22 256GB", cat: "Phones", brand: "Samsung", price: 250, was: 500, cond: "Good", condClass: "cond-wear-light", emoji: "\u{1F4F1}", img: "linear-gradient(135deg,#1e1b4b,#4c1d95)", desc: "Working great, minor corner wear, includes charger." },
+      { id: 6, title: "AirPods Pro 2 (USB-C)", cat: "Audio", brand: "Apple", price: 130, was: 249, cond: "Like New", condClass: "cond-wear-mint", emoji: "\u{1F3A7}", img: "linear-gradient(135deg,#6b7280,#111827)", desc: "Opened once, all tips + cable, case clean." },
+      { id: 7, title: "Sony WH-1000XM5", cat: "Audio", brand: "Sony", price: 220, was: 400, cond: "Excellent", condClass: "cond-wear-mint", emoji: "\u{1F3A7}", img: "linear-gradient(135deg,#581c87,#2e1065)", desc: "ANC headphones, tested, minimal use, carry case." },
+      { id: 8, title: "DualSense Controller", cat: "Accessories", brand: "Sony", price: 55, was: 70, cond: "Like New", condClass: "cond-wear-mint", emoji: "\u{1F3B4}", img: "linear-gradient(135deg,#164e63,#083344)", desc: "Genuine Sony, no drift, cleaned & sanitized." }
     ];
 
     var cart = {};
@@ -155,9 +160,11 @@
 
     function cardHtml(p) {
       return '<div class="card">' +
-        '<div class="card-img" style="background:' + p.img + '">' + p.emoji + (p.sold ? '<span class="card-sold">SOLD</span>' : '') + '</div>' +
+        '<div class="card-img" style="background:' + p.img + '">' + p.emoji +
+        (p.cond ? '<span class="card-cond ' + p.condClass + '">' + p.cond + '</span>' : '') +
+        (p.sold ? '<span class="card-sold">SOLD</span>' : '') + '</div>' +
         '<div class="card-body">' +
-        '<span class="card-cat">' + p.cat + '</span>' +
+        '<span class="card-cat">' + p.cat + (p.brand ? ' \u00b7 ' + p.brand : '') + '</span>' +
         '<div class="card-title">' + p.title + '</div>' +
         '<div class="card-desc">' + p.desc + '</div>' +
         '<div class="card-foot">' +
