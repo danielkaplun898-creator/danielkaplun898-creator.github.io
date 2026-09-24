@@ -85,13 +85,33 @@
 </main>
 
 <div id="msg"></div>
+<div id="log" style="max-height:160px; overflow:auto; padding:10px 24px; font-family:monospace; font-size:11px; border-top:1px solid #1c2733; background:#0d1117;"></div>
 <footer>Runs 100% in your browser. No video leaves your device. Uses MediaPipe FaceMesh.</footer>
 
-<script type="module">
-import { FilesetResolver, FaceLandmarker } from './assets/mediapipe/vision_bundle.mjs';
-const WASM = './assets/mediapipe/wasm';
-const MODEL = './assets/mediapipe/face_landmarker.task';
+<script>
+window.__diag = function (msg, color) {
+  var el = document.getElementById('log');
+  if (!el) return;
+  var d = document.createElement('div');
+  d.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+  d.style.color = color || '#8aa2b9';
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+  if (el.childNodes.length > 40) el.removeChild(el.firstChild);
+};
+window.__diag('page boot', '#00d4a0');
+</script>
+<script>
 (async () => {
+  let FilesetResolver, FaceLandmarker;
+  try {
+    ({ FilesetResolver, FaceLandmarker } = await import('./assets/mediapipe/vision_bundle.mjs'));
+    window.__diag('mediapipe bundle loaded (self-hosted)', '#00d4a0');
+  } catch (e) {
+    window.__diag('IMPORT FAILED: ' + e.name + ' ' + e.message, '#ff5d5d');
+    document.getElementById('statusText').textContent = 'bundle import failed';
+    return;
+  }
   window.addEventListener('error', (e) => showErr('Error: ' + (e.message || e.type)));
   window.addEventListener('unhandledrejection', (e) => showErr('Error: ' + (e.reason && e.reason.message || e.reason)));
   const video = document.getElementById('video');
@@ -103,6 +123,7 @@ const MODEL = './assets/mediapipe/face_landmarker.task';
   let smooth = { x: 0, y: 0 };
   let landmarker = null;
   let usingCPU = false;
+  let frameCount = 0;
 
   function setStatus(text, live) {
     document.getElementById('statusText').textContent = text;
@@ -145,12 +166,11 @@ const MODEL = './assets/mediapipe/face_landmarker.task';
   const camOk = await startCamera();
   if (!camOk) return;
 
-  // --- load MediaPipe model ---
+// --- load MediaPipe model ---
   try {
-    if (typeof FilesetResolver === 'undefined') throw new Error('MediaPipe CDN blocked - check internet connection');
-    const vision = await FilesetResolver.forVisionTasks(
-      './assets/mediapipe/wasm'
-    );
+    window.__diag('loading wasm runtime...');
+    const vision = await FilesetResolver.forVisionTasks('./assets/mediapipe/wasm');
+    window.__diag('wasm runtime OK');
     landmarker = await FaceLandmarker.createFromOptions(vision, {
       baseOptions: {
         modelAssetPath: './assets/mediapipe/face_landmarker.task',
@@ -160,9 +180,11 @@ const MODEL = './assets/mediapipe/face_landmarker.task';
       outputFacialTransformationMatrixes: false,
       numFaces: 1
     });
+    window.__diag('face landmarker created (GPU)', '#00d4a0');
     setStatus('TRACKING', true);
   } catch (e) {
-    showErr('Model failed to load: ' + e.message + ' (need internet for MediaPipe CDN)');
+    window.__diag('MODEL/VISION INIT FAILED: ' + e.name + ' ' + e.message, '#ff5d5d');
+    showErr('Model failed to load: ' + e.message);
     setStatus('model error', false);
   }
 
@@ -183,25 +205,33 @@ const MODEL = './assets/mediapipe/face_landmarker.task';
 
     let gaze = null;
     if (!landmarker) { requestAnimationFrame(loop); return; }
-    let res;
+let res;
     try {
       res = landmarker.detectForVideo(video, performance.now());
     } catch (err) {
+      window.__diag('detect threw: ' + err.name + ' ' + err.message, '#ffd166');
       if (!usingCPU) {
         usingCPU = true;
         setStatus('GPU failed - switching to CPU...', false);
-        const vision = await FilesetResolver.forVisionTasks('./assets/mediapipe/wasm');
-        landmarker = await FaceLandmarker.createFromOptions(vision, {
-          baseOptions: { modelAssetPath: './assets/mediapipe/face_landmarker.task', delegate: 'CPU' },
-          outputFaceBlendshapes: false, outputFacialTransformationMatrixes: false, numFaces: 1
-        });
-        setStatus('TRACKING (CPU)', true);
+        try {
+          const vision = await FilesetResolver.forVisionTasks('./assets/mediapipe/wasm');
+          landmarker = await FaceLandmarker.createFromOptions(vision, {
+            baseOptions: { modelAssetPath: './assets/mediapipe/face_landmarker.task', delegate: 'CPU' },
+            outputFaceBlendshapes: false, outputFacialTransformationMatrixes: false, numFaces: 1
+          });
+          window.__diag('switched to CPU', '#00d4a0');
+          setStatus('TRACKING (CPU)', true);
+        } catch (e2) {
+          window.__diag('CPU init failed: ' + e2.name + ' ' + e2.message, '#ff5d5d');
+        }
       } else {
         showErr('Detection error: ' + err.message);
       }
       requestAnimationFrame(loop); return;
     }
     if (res.faceLandmarks && res.faceLandmarks.length > 0) {
+      frameCount++;
+      if (frameCount % 90 === 1) window.__diag('detect OK: face found (' + res.faceLandmarks[0].length + ' pts), frame ' + frameCount, '#00d4a0');
       const lm = res.faceLandmarks[0];
       // landmark indices (478-model): eyes + iris
       // right eye (subject): corners 33 & 133, iris 468; left eye: corners 362 & 263, iris 473
@@ -254,6 +284,8 @@ const MODEL = './assets/mediapipe/face_landmarker.task';
       document.getElementById('eyes').textContent = 'TRACKING';
       document.getElementById('eyes').style.color = '#00d4a0';
     } else {
+      frameCount++;
+      if (frameCount % 90 === 1) window.__diag('detect OK: NO face found (frame ' + frameCount + ')', '#ffd166');
       document.getElementById('face').textContent = 'SEARCHING';
       document.getElementById('face').style.color = '#ffd166';
       document.getElementById('eyes').textContent = 'no eyes';
