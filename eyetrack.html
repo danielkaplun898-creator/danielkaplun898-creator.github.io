@@ -77,6 +77,8 @@
         <div class="stat"><div class="lbl">Gaze Y</div><div class="val" id="gy">0.00</div></div>
         <div class="stat"><div class="lbl">Focus</div><div class="val" id="focus">-</div></div>
         <div class="stat"><div class="lbl">Blink</div><div class="val blink" id="blink">none</div></div>
+        <div class="stat"><div class="lbl">Face</div><div class="val" id="face">searching...</div></div>
+        <div class="stat"><div class="lbl">Eyes</div><div class="val" id="eyes">searching...</div></div>
       </div>
     </div>
   </div>
@@ -98,6 +100,7 @@
 
   let smooth = { x: 0, y: 0 };
   let landmarker = null;
+  let usingCPU = false;
 
   function setStatus(text, live) {
     document.getElementById('statusText').textContent = text;
@@ -178,7 +181,24 @@
 
     let gaze = null;
     if (!landmarker) { requestAnimationFrame(loop); return; }
-    const res = landmarker.detectForVideo(video, performance.now());
+    let res;
+    try {
+      res = landmarker.detectForVideo(video, performance.now());
+    } catch (err) {
+      if (!usingCPU) {
+        usingCPU = true;
+        setStatus('GPU failed - switching to CPU...', false);
+        const vision = await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+        landmarker = await FaceLandmarker.createFromOptions(vision, {
+          baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task', delegate: 'CPU' },
+          outputFaceBlendshapes: false, outputFacialTransformationMatrixes: false, numFaces: 1
+        });
+        setStatus('TRACKING (CPU)', true);
+      } else {
+        showErr('Detection error: ' + err.message);
+      }
+      requestAnimationFrame(loop); return;
+    }
     if (res.faceLandmarks && res.faceLandmarks.length > 0) {
       const lm = res.faceLandmarks[0];
       // landmark indices (478-model): eyes + iris
@@ -227,6 +247,15 @@
       ctx.fillStyle = '#ffe763';
       const [ix, iy] = px(R.iris); ctx.beginPath(); ctx.arc(ix, iy, 4, 0, Math.PI*2); ctx.fill();
       const [ix2, iy2] = px(L.iris); ctx.beginPath(); ctx.arc(ix2, iy2, 4, 0, Math.PI*2); ctx.fill();
+      document.getElementById('face').textContent = 'LOCKED';
+      document.getElementById('face').style.color = '#00d4a0';
+      document.getElementById('eyes').textContent = 'TRACKING';
+      document.getElementById('eyes').style.color = '#00d4a0';
+    } else {
+      document.getElementById('face').textContent = 'SEARCHING';
+      document.getElementById('face').style.color = '#ffd166';
+      document.getElementById('eyes').textContent = 'no eyes';
+      document.getElementById('eyes').style.color = '#ffd166';
     }
     ctx.restore();
 
