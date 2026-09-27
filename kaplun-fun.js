@@ -252,9 +252,18 @@
   }
 
   /* ---------- Konami code + word triggers ---------- */
+  var sbMod = {}; /* overridden by the soundboard module with drop()/beast() */
+  function sbSortaTail(typed, w) { return typed.indexOf(w) !== -1 && typed.lastIndexOf(w) + w.length === typed.length; }
   var konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
   var buf = [];
-  var trig = { bacon: '🥓 541 kcal / 100g. Always worth it. A few strips. As a treat.', pizza: '🍕 Fun fact: the demo secretly hopes "pizza" was going to win.', banana: '🍌 89 kcal, pure happiness. Potassium and peace of mind.', golden: '🍩 Now you clicked your way to a donut. Eat nothing. Meditate.' };
+  var trig = {
+    bacon: '🥓 541 kcal / 100g. Always worth it. A few strips. As a treat.',
+    pizza: '🍕 Fun fact: the demo secretly hopes "pizza" was going to win.',
+    banana: '🍌 89 kcal, pure happiness. Potassium and peace of mind.',
+    golden: '🍩 Now you clicked your way to a donut. Eat nothing. Meditate.',
+    drop: function () { if (sbMod.drop) sbMod.drop(); },
+    beast: function () { if (sbMod.beast) sbMod.beast(); }
+  };
   document.addEventListener('keydown', function (e) {
     var inInput = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT');
     if (e.key === 'Escape') { closeTerminal(); togglePanic(false); return; }
@@ -274,9 +283,9 @@
     }
     if (!inInput && typed.length >= 3) {
       for (var w in trig) {
-        if (typed.lastIndexOf(w) !== -1 && !new RegExp('[a-z]' + w).test(typed) && typed.indexOf(w) !== -1) {
-          var start = typed.indexOf(w);
-          if (start + w.length === typed.length) { toast(trig[w]); }
+        if (sbSortaTail(typed, w)) {
+          var v = trig[w];
+          if (typeof v === 'function') v(); else toast(v);
         }
       }
     }
@@ -406,7 +415,7 @@
   if (foot && !foot.querySelector('.hint-press')) {
     var hp = document.createElement('span');
     hp.className = 'hint-press';
-    hp.textContent = 'psst — ↑ ↑ ↓ ↓ ← → ← → B A';
+    hp.textContent = 'psst — ↑ ↑ ↓ ↓ ← → ← → B A · tap "1" then "6" fast · type "beast" or "drop"';
     foot.appendChild(hp);
   }
 
@@ -684,9 +693,9 @@
       sbPads[i].classList.remove('rec', 'play');
       sbPads[i].querySelector('.sb-hint').textContent = '• ' + Math.round(blob.size / 1024) + ' KB · tap to play';
     }
-    function sbPlay(i) {
+    function sbPlay(i, keep) {
       if (!sbUrl[i]) return;
-      while (sbPlaySet.length) { sbPlaySet.pop().pause(); }
+      if (!keep) while (sbPlaySet.length) { sbPlaySet.pop().pause(); }
       var a = new Audio(sbUrl[i]);
       a.volume = 1;
       sbPlaySet.push(a);
@@ -755,7 +764,7 @@
     function sbHoldEnd(i) {
       if (sbHoldT !== null && sbHolder === i) {
         clearTimeout(sbHoldT); sbHoldT = null; sbHolder = null;
-        sbPlay(i);
+        if (sbBeastOn) sbArp(120, false); else sbPlay(i);
         return;
       }
       if (sbRec && sbRec.i === i) {
@@ -764,6 +773,34 @@
       }
     }
     function sbStopHoldTimer() { if (sbHoldT) { clearTimeout(sbHoldT); sbHoldT = null; sbHolder = null; } }
+
+    /* --- special combos: The Drop (1 then 6 fast) and Beast Mode --- */
+    var sbLastPk = { key: -1, t: 0 };
+    var sbBeastOn = false, sbBeastT = null;
+    function sbArp(delay, fromCombo) {
+      if (!sbPads.length) return;
+      if (sbStatus && fromCombo) sbStatus.textContent = '🎧 The Drop! Full arpeggio.';
+      for (var i = 0; i < sbPads.length; i++) {
+        (function (p) { setTimeout(function () { sbPlay(p, true); }, p * delay); })(i);
+      }
+    }
+    function sbBeastToggle() {
+      if (!sbPads.length) return;
+      sbBeastOn = !sbBeastOn;
+      if (sbBeastOn) {
+        clearTimeout(sbBeastT);
+        sbBeastT = setTimeout(function () {
+          sbBeastOn = false;
+          if (sbStatus) sbStatus.textContent = 'Beast mode cooled down 🐻';
+        }, 15000);
+        if (sbStatus) sbStatus.textContent = '🐻 BEAST MODE — every pad drops the arpeggio for 15s!';
+      } else {
+        if (sbStatus) sbStatus.textContent = 'Beast mode off. Back to discipline.';
+      }
+      sbArp(120, false);
+    }
+    sbMod.drop = function () { sbArp(150, true); };
+    sbMod.beast = function () { sbBeastToggle(); };
 
     for (var s = 0; s < 6; s++) {
       (function (i) {
@@ -785,7 +822,14 @@
       var inInput2 = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT');
       if (inInput2 || e.repeat) return;
       var i2 = SB_KEYS.indexOf(e.key);
-      if (i2 !== -1) sbHoldStart(i2);
+      if (i2 !== -1) {
+        if (sbLastPk.key === 0 && i2 === 5 && Date.now() - sbLastPk.t < 600) {
+          if (sbStatus) sbStatus.textContent = '🎧 The Drop! Full arpeggio.';
+          sbArp(140, true);
+        }
+        sbLastPk = { key: i2, t: Date.now() };
+        sbHoldStart(i2);
+      }
     });
     document.addEventListener('keyup', function (e) {
       var i3 = SB_KEYS.indexOf(e.key);
