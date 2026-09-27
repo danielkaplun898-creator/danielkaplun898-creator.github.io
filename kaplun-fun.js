@@ -30,6 +30,7 @@
   }
 
   /* ---------- fireworks on click (spawn 12 particles) ---------- */
+  var gameActive = false;
   function burst(x, y, n, colors) {
     var fw = $('fx-canvas');
     if (!fw) {
@@ -74,8 +75,9 @@
     })(start);
   }
   document.addEventListener('pointerdown', function (e) {
+    if (gameActive) return;
     var el = e.target;
-    if (el.closest && el.closest('a,button,input,select,textarea,[onclick],.t-row')) return;
+    if (el.closest && el.closest('a,button,input,select,textarea,[onclick],.t-row,#game-area')) return;
     burst(e.clientX, e.clientY, 12, ['#34D399', '#06B6D4', '#F59E0B', '#8B5CF6', '#EF4444', '#fff']);
   });
 
@@ -256,7 +258,7 @@
   document.addEventListener('keydown', function (e) {
     var inInput = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT');
     if (e.key === 'Escape') { closeTerminal(); togglePanic(false); return; }
-    if (e.key === 'p' && !inInput) { togglePanic(); return; }
+    if (e.key === 'p' && !inInput && !gameActive) { togglePanic(); return; }
     buf.push(e.key.toLowerCase());
     if (buf.length > konami.length) buf.shift();
     var kk = '';
@@ -406,5 +408,204 @@
     hp.className = 'hint-press';
     hp.textContent = 'psst — ↑ ↑ ↓ ↓ ← → ← → B A';
     foot.appendChild(hp);
+  }
+
+  /* ---------- Stay Under 2,000 minigame ---------- */
+  var gCanvas = $('g-canvas');
+  if (gCanvas) {
+    var gArea = $('game-area'), gStart = $('g-start'), gOver = $('g-overlay'),
+        gScore = $('g-score'), gTime = $('g-time'), gBest = $('g-best'),
+        gFill = $('g-ring-fill'), gTxt = $('g-ring-txt'),
+        gOverTitle = $('g-over-title'), gOverSub = $('g-over-sub'),
+        gStScore = $('g-st-score'), gStFoods = $('g-st-foods'), gStKcal = $('g-st-kcal'),
+        gAgain = $('g-play-again');
+    var gctx = gCanvas.getContext('2d');
+    var GOAL = 2000, DURATION = 45, CALM = 800, FONT = "'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif";
+
+    var HEALTHY = [['Broccoli', '🥦', 34], ['Carrot', '🥕', 41], ['Apple', '🍎', 52], ['Strawberry', '🍓', 32],
+      ['Cucumber', '🥒', 15], ['Orange', '🍊', 47], ['Blueberry', '🫐', 57], ['Grapes', '🍇', 69], ['Tomato', '🍅', 18]];
+    var JUNK = [['Donut', '🍩', 421], ['Pizza', '🍕', 298], ['Fries', '🍟', 312], ['Burger', '🍔', 303],
+      ['Cookie', '🍪', 492], ['Chocolate', '🍫', 535], ['Croissant', '🥐', 406]];
+
+    var state = null;
+
+    function canvasSize() {
+      gCanvas.width = gArea.clientWidth;
+      gCanvas.height = gArea.clientHeight;
+    }
+    window.addEventListener('resize', function () { if (state) { canvasSize(); state.bx = Math.min(state.bx, gCanvas.width); } });
+
+    function newGame() {
+      var best = parseInt(localStorage.getItem('kaplun-best') || '0', 10);
+      gBest.textContent = best;
+      canvasSize();
+      state = {
+        score: 0, kcal: 0, foods: 0, left: DURATION, bx: gCanvas.width / 2, bw: 64,
+        item: null, spawnIn: 600, lastSpawn: 0, running: true, over: false,
+        raf: null, lastT: 0, shakes: 0, floats: [], healthyStreak: 0
+      };
+      gOver.classList.remove('show');
+      gScore.textContent = '0';
+      gTime.textContent = DURATION;
+      gFill.style.width = '0%';
+      gFill.classList.remove('danger');
+      gTxt.textContent = '0 / ' + GOAL.toLocaleString() + ' kcal';
+      gStart.textContent = 'Reset';
+      gameActive = true;
+      document.addEventListener('keydown', gKeyDown);
+      document.addEventListener('keyup', gKeyUp);
+      gArea.addEventListener('pointermove', gPointer);
+      gArea.addEventListener('pointerdown', gPointer);
+      state.lastT = performance.now();
+      state.raf = requestAnimationFrame(gLoop);
+    }
+
+    var keys = {};
+    function gKeyDown(e) {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+      if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && state) e.preventDefault();
+    }
+    function gKeyUp(e) {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+    }
+    function gPointer(e) {
+      if (!state || state.over) return;
+      var r = gArea.getBoundingClientRect();
+      state.bx = e.clientX - r.left;
+    }
+
+    function spawnItem() {
+      var junk = Math.random() < 0.4;
+      var pool = junk ? JUNK : HEALTHY;
+      var f = pool[Math.floor(Math.random() * pool.length)];
+      var speed = 90 + Math.min(150, (DURATION - state.left) * 2.6) + Math.random() * 60;
+      state.item = {
+        name: f[0], emoji: f[1], kcal: f[2], x: rand(30, gCanvas.width - 30),
+        y: -40, v: speed, r: 24, junk: junk
+      };
+    }
+
+    function gLoop(now) {
+      if (!state) return;
+      var dt = (now - state.lastT) / 1000;
+      state.lastT = now;
+      gctx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+
+      if (state.running) {
+        state.left -= dt;
+        if (state.left <= 0) return endGame('time');
+        gTime.textContent = Math.max(0, Math.ceil(state.left));
+
+        if (keys.left) state.bx -= 520 * dt;
+        if (keys.right) state.bx += 520 * dt;
+        state.bx = Math.max(state.bw / 2, Math.min(gCanvas.width - state.bw / 2, state.bx));
+
+        if (!state.item && now - state.lastSpawn >= state.spawnIn) {
+          state.lastSpawn = now;
+          state.spawnIn = Math.max(380, CALM - (DURATION - state.left) * 9);
+          spawnItem();
+        }
+        var it = state.item;
+        if (it) {
+          it.y += it.v * dt;
+          var bx1 = state.bx - state.bw / 2, bx2 = state.bx + state.bw / 2;
+          if (it.y + it.r >= gCanvas.height - 54 && it.x > bx1 - it.r && it.x < bx2 + it.r && !it.gone) {
+            it.gone = true;
+            state.foods++;
+            if (it.junk) {
+              state.kcal += it.kcal;
+              state.shakes = 3;
+              state.floats.push({ x: it.x, y: gCanvas.height - 60, txt: '+' + it.kcal + ' kcal 🔥', t: 0, bad: true });
+              state.healthyStreak = 0;
+              if (state.kcal >= GOAL) return endGame('bust');
+            } else {
+              state.score += it.kcal;
+              state.healthyStreak++;
+              state.floats.push({ x: it.x, y: gCanvas.height - 60, txt: '+', t: 0, bad: false });
+              if (state.healthyStreak > 0 && state.healthyStreak % 8 === 0) { state.left = Math.min(DURATION, state.left + 2); }
+            }
+            state.item = null;
+            state.spawnIn = 200;
+          }
+          if (!it.gone && it.y - it.r > gCanvas.height) state.item = null;
+
+          gctx.font = '34px ' + FONT;
+          gctx.textAlign = 'center';
+          gctx.fillText(it.emoji, it.x, it.y);
+          gctx.font = '13px ' + FONT;
+          gctx.fillStyle = it.junk ? 'rgba(239,68,68,0.9)' : 'rgba(52,211,153,0.9)';
+          gctx.fillText(it.kcal, it.x, it.y + 40);
+        }
+
+        gScore.textContent = state.score;
+        var pct = Math.min(100, state.kcal / GOAL * 100);
+        gFill.style.width = pct + '%';
+        gFill.classList.toggle('danger', pct >= 80);
+        gTxt.textContent = state.kcal.toLocaleString() + ' / ' + GOAL.toLocaleString() + ' kcal';
+      }
+
+      /* basket */
+      var bx = state.bx;
+      gctx.beginPath();
+      gctx.arc(bx, gCanvas.height - 38, 30, 0, Math.PI * 2);
+      gctx.fillStyle = 'rgba(52,211,153,0.18)';
+      gctx.fill();
+      gctx.strokeStyle = 'rgba(52,211,153,0.7)';
+      gctx.lineWidth = 2;
+      gctx.stroke();
+      gctx.font = '34px ' + FONT;
+      gctx.textAlign = 'center';
+      gctx.fillText('🧺', bx, gCanvas.height - 30);
+
+      /* float texts */
+      for (var i = state.floats.length - 1; i >= 0; i--) {
+        var f = state.floats[i];
+        f.t += dt;
+        if (f.t > 1) { state.floats.splice(i, 1); continue; }
+        gctx.font = '14px ' + FONT;
+        gctx.fillStyle = f.bad ? '#ff6b6b' : '#7dff9b';
+        gctx.fillText(f.txt, f.x, f.y - f.t * 46);
+      }
+
+      if (state.shakes > 0) {
+        state.shakes--;
+        gArea.classList.add('shake');
+        setTimeout(function () { gArea.classList.remove('shake'); }, 340);
+      }
+
+      state.raf = requestAnimationFrame(gLoop);
+    }
+
+    function endGame(reason) {
+      state.running = false;
+      state.over = true;
+      gameActive = false;
+      cancelAnimationFrame(state.raf);
+      var best = parseInt(localStorage.getItem('kaplun-best') || '0', 10);
+      var newBest = state.score > best;
+      localStorage.setItem('kaplun-best', String(state.score));
+      gBest.textContent = Math.max(best, state.score);
+      gOverTitle.textContent = reason === 'bust' ? '💥 OVER-EATEN!' : '⏱ Time up!';
+      gOverSub.textContent = reason === 'bust'
+        ? 'You hit 2,000 kcal. The donut won. It usually does.'
+        : (newBest ? 'New personal best — you beat the budget like a champ.'
+                   : 'Solid run. The donut is watching, impressed.');
+      gStScore.textContent = state.score;
+      gStFoods.textContent = state.foods;
+      gStKcal.textContent = state.kcal.toLocaleString();
+      gOver.classList.add('show');
+      gStart.textContent = 'Play again';
+    }
+
+    gStart.addEventListener('click', function () {
+      if (state) cancelAnimationFrame(state.raf);
+      newGame();
+    });
+    gAgain.addEventListener('click', function () {
+      if (state) cancelAnimationFrame(state.raf);
+      newGame();
+    });
   }
 })();

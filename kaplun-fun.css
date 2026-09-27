@@ -78,3 +78,27 @@
 /* ===== Footer hint ===== */
 .hint-press { display: block; margin-top: 0.4rem; font-size: 0.72rem; color: #2a2a2a; transition: color 0.3s; cursor: default; }
 .hint-press:hover { color: var(--green-light); }
+
+/* ===== Stay Under 2,000 minigame ===== */
+#game { max-width: 1000px; margin: 0 auto; }
+.game-hud { display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 0.6rem 1rem; font-size: 0.9rem; flex-wrap: wrap; }
+.game-hud .gh-item { min-width: 72px; }
+.game-hud b { color: var(--green-light); }
+.g-ring { flex: 1; min-width: 140px; max-width: 340px; height: 16px; background: #1e1e1e; border-radius: 100px; overflow: hidden; position: relative; }
+.g-ring-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--green), var(--cyan)); transition: width 0.2s ease; }
+.g-ring-fill.danger { background: linear-gradient(90deg, var(--amber), var(--red)); }
+.g-ring span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.66rem; font-weight: 700; color: #fff; letter-spacing: 0.3px; }
+.game-area { position: relative; height: 380px; background: radial-gradient(circle at 50% 0%, rgba(46,125,50,0.08), transparent 70%), var(--bg-card); border: 1px solid var(--border); border-radius: 20px; margin-top: 1rem; overflow: hidden; touch-action: none; cursor: pointer; }
+#g-canvas { width: 100%; height: 100%; display: block; }
+.shake { animation: gshake 0.35s; }
+@keyframes gshake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-7px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(3px); } }
+.game-ctls { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; }
+.board { color: var(--text-muted); font-size: 0.85rem; }
+.board b { color: var(--green-light); }
+.g-overlay { position: absolute; inset: 0; background: rgba(6, 10, 6, 0.82); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; text-align: center; padding: 1.5rem; }
+.g-overlay.show { display: flex; }
+.g-overlay h3 { font-size: 1.6rem; margin-bottom: 0.4rem; letter-spacing: -0.5px; }
+.g-overlay p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.2rem; }
+.g-overlay .g-stats { display: flex; gap: 1.6rem; justify-content: center; margin-bottom: 1.4rem; font-size: 0.9rem; }
+.g-overlay .g-stats div span { display: block; color: var(--text-muted); font-size: 0.72rem; }
+.g-overlay .g-stats div b { color: var(--green-light); font-size: 1.3rem; }

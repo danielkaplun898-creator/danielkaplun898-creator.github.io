@@ -457,6 +457,41 @@
     </div>
   </section>
 
+  <!-- Mini game -->
+  <section id="game">
+    <div class="section-title">Mini Game</div>
+    <div class="section-heading">Stay Under 2,000</div>
+    <div class="section-desc">Catch healthy foods for points. Junk food fills your calorie ring fast. Hit 2,000 kcal and you've over-eaten. Move with your mouse or touch — or arrow keys.</div>
+
+    <div class="game-wrap" style="margin-top: 3rem;">
+      <div class="game-hud">
+        <div class="gh-item">Score <b id="g-score">0</b></div>
+        <div class="g-ring"><div class="g-ring-fill" id="g-ring-fill"></div><span id="g-ring-txt">0 / 2,000 kcal</span></div>
+        <div class="gh-item">Time <b id="g-time">45</b>s</div>
+      </div>
+      <div class="game-area" id="game-area">
+        <canvas id="g-canvas"></canvas>
+        <div class="g-overlay" id="g-overlay">
+          <div>
+            <h3 id="g-over-title"></h3>
+            <p id="g-over-sub"></p>
+            <div class="g-stats">
+              <div><span>Score</span><b id="g-st-score">0</b></div>
+              <div><span>Foods caught</span><b id="g-st-foods">0</b></div>
+              <div><span>Calories</span><b id="g-st-kcal">0</b></div>
+            </div>
+            <button class="tr-add" id="g-play-again" style="padding: 0.7rem 1.6rem;">Play again</button>
+          </div>
+        </div>
+      </div>
+      <div class="game-ctls">
+        <button class="t-clear" id="g-start">▶ Start game</button>
+        <span class="board">Best: <b id="g-best">0</b></span>
+        <span class="board" style="font-size: 0.75rem;">💡 8 healthy catches = +2 seconds</span>
+      </div>
+    </div>
+  </section>
+
   <section id="about">
     <div class="section-title">About</div>
     <div class="section-heading">Built by Kaplun</div>
