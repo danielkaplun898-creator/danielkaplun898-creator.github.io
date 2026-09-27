@@ -12,6 +12,7 @@
   <meta property="og:image" content="https://danielkaplun898-creator.github.io/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="kaplun-fun.css">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root { --green: #2E7D32; --green-light: #4CAF50; --bg: #0a0a0a; --bg-card: #141414; --text: #fff; --text-muted: #888; --border: #222; --cyan: #06B6D4; --amber: #F59E0B; --red: #EF4444; --purple: #8B5CF6; }
@@ -420,6 +421,42 @@
     </div>
   </section>
 
+  <!-- Live tracker demo -->
+  <section id="tryit">
+    <div class="section-title">Live Demo</div>
+    <div class="section-heading">Try CalorieTracker right here</div>
+    <div class="section-desc">Search a food, add it, watch the ring fill. This is a real working widget — the app just does 600,000 more foods.</div>
+
+    <div class="tracker-demo">
+      <div class="t-side">
+        <div class="tring">
+          <div class="tring-inner">
+            <div class="tring-num" id="tring-num">0</div>
+            <div class="tring-sub">calories logged</div>
+          </div>
+        </div>
+        <div class="t-goal">daily goal
+          <select id="t-goal">
+            <option value="1500">1,500</option>
+            <option value="2000" selected>2,000</option>
+            <option value="2500">2,500</option>
+            <option value="3000">3,000</option>
+          </select>
+        </div>
+        <div class="t-payload" id="t-payload"></div>
+        <button class="t-clear" id="t-clear">Clear tray</button>
+      </div>
+      <div class="t-main">
+        <div class="t-search">
+          <span class="t-search-ic">🔍</span>
+          <input id="t-input" type="text" placeholder="Search a food — try 'pizza', 'banana', 'coffee'..." autocomplete="off">
+        </div>
+        <div class="t-results" id="t-results"></div>
+        <div class="t-tip">💡 Pick an amount (per 100 g) and hit <strong>Add</strong>. Hit your goal exactly and something nice happens.</div>
+      </div>
+    </div>
+  </section>
+
   <section id="about">
     <div class="section-title">About</div>
     <div class="section-heading">Built by Kaplun</div>
@@ -498,6 +535,7 @@
     <p>&copy; 2026 <a href="#">Kaplun</a>. All rights reserved. Built with Flutter. <a href="privacy-policy.html">Privacy Policy</a>.</p>
   </footer>
 
+  <script src="kaplun-fun.js"></script>
   <script>
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
