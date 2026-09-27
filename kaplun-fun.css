@@ -102,3 +102,20 @@
 .g-overlay .g-stats { display: flex; gap: 1.6rem; justify-content: center; margin-bottom: 1.4rem; font-size: 0.9rem; }
 .g-overlay .g-stats div span { display: block; color: var(--text-muted); font-size: 0.72rem; }
 .g-overlay .g-stats div b { color: var(--green-light); font-size: 1.3rem; }
+
+/* ===== Soundboard ===== */
+#soundboard { max-width: 860px; margin: 0 auto; }
+.sb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 2.4rem; }
+.sb-pad { position: relative; background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.6rem; cursor: pointer; user-select: none; touch-action: manipulation; transition: all 0.15s; overflow: hidden; }
+.sb-pad:hover { border-color: var(--green-light); transform: translateY(-2px); }
+.sb-pad .sb-key { position: absolute; top: 10px; left: 12px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); border: 1px solid var(--border); border-radius: 6px; padding: 0.15rem 0.5rem; }
+.sb-pad .sb-ico { font-size: 2.2rem; line-height: 1; filter: drop-shadow(0 4px 12px rgba(52,211,153,0.15)); }
+.sb-pad .sb-name { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); }
+.sb-pad .sb-hint { font-size: 0.68rem; color: #555; }
+.sb-pad.rec { border-color: var(--red); box-shadow: 0 0 30px rgba(239,68,68,0.35); }
+.sb-pad.rec .sb-ico { animation: sb-pulse 0.9s infinite; }
+.sb-pad.play { border-color: var(--cyan); box-shadow: 0 0 30px rgba(6,182,212,0.35); }
+@keyframes sb-pulse { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239,68,68,0)); } 50% { transform: scale(1.15); filter: drop-shadow(0 0 16px rgba(239,68,68,0.8)); } }
+.sb-rec-dot { position: absolute; top: 12px; right: 12px; width: 12px; height: 12px; border-radius: 50%; background: var(--red); box-shadow: 0 0 12px var(--red); display: none; }
+.sb-pad.rec .sb-rec-dot { display: block; animation: sb-pulse 0.9s infinite; }
+.sb-pad.rec .sb-hint { color: var(--red); font-weight: 700; }

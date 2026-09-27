@@ -608,4 +608,196 @@
       newGame();
     });
   }
+
+  /* ---------- Soundboard: press a key to record ---------- */
+  var sbGrid = $('sb-grid');
+  if (sbGrid) {
+    var SB_KEYS = ['1', '2', '3', '4', '5', '6'];
+    var SB_TONES = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5];
+    var SB_ICOS = ['🎛️', '🥁', '🔔', '🪇', '🎙️', '🕹️'];
+    var SB_MAX = 8000;
+    var sbPads = [], sbUrl = {}, sbRec = null, sbStatus = $('sb-status'),
+        sbReset = $('sb-reset'), sbMedia = null, sbHolder = null, sbHoldT = null, sbPlaySet = [];
+
+    function sbMap() { /* harmonic sq+sin for a nicer default blip */
+      var sr = 44100, n = Math.floor(sr * 0.55), out = new Float32Array(n);
+      var fA = [1, 2, 3], gA = [1, 0.6, 0.25], sA = [0.5, 0.35, 0.2];
+      for (var h = 0; h < 3; h++) {
+        for (var i = 0; i < n; i++) {
+          var t = i / sr;
+          var env = Math.min(1, t / 0.01) * Math.pow(1 - t / 0.55, 2);
+          out[i] += sA[h] * (Math.sin(2 * Math.PI * fA[h] * 180 * t) > 0 ? gA[h] : -gA[h]) * env;
+        }
+      }
+      var data = new ArrayBuffer(44 + out.length * 2); var dv = new DataView(data);
+      dv.setUint32(0, 0x46464952, false); dv.setUint32(4, 36 + out.length * 2, true); dv.setUint32(8, 0x57415645, false);
+      dv.setUint32(12, 0x666d7420, false); dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+      dv.setUint32(24, sr, true); dv.setUint32(28, sr * 2, true); dv.setUint16(32, 2, true); dv.setUint16(34, 16, true);
+      dv.setUint32(36, 0x64617461, false); dv.setUint32(40, out.length * 2, true);
+      for (var j = 0; j < out.length; j++) dv.setInt16(44 + j * 2, (out[j] * 22000) | 0, true);
+      return new Blob([data], { type: 'audio/wav' });
+    }
+
+    /* IndexedDB persistence */
+    function idb() {
+      return new Promise(function (res, rej) {
+        var rq = indexedDB.open('kaplun-sb', 1);
+        rq.onupgradeneeded = function () { rq.result.createObjectStore('sounds'); };
+        rq.onsuccess = function () { res(rq.result); };
+        rq.onerror = function () { rej(rq.error); };
+      });
+    }
+    function dbPut(key, blob) {
+      return idb().then(function (db) {
+        return new Promise(function (res, rej) {
+          var tx = db.transaction('sounds', 'readwrite');
+          tx.objectStore('sounds').put(blob, key);
+          tx.oncomplete = res; tx.onerror = function () { rej(tx.error); };
+        });
+      });
+    }
+    function dbGet(key) {
+      return idb().then(function (db) {
+        return new Promise(function (res, rej) {
+          var rq = db.transaction('sounds').objectStore('sounds').get(key);
+          rq.onsuccess = function () { res(rq.result); };
+          rq.onerror = function () { rej(rq.error); };
+        });
+      });
+    }
+    function dbDel(key) {
+      return idb().then(function (db) {
+        return new Promise(function (res, rej) {
+          var tx = db.transaction('sounds', 'readwrite');
+          tx.objectStore('sounds').delete(key);
+          tx.oncomplete = res; tx.onerror = function () { rej(tx.error); };
+        });
+      });
+    }
+
+    function sbLoad(i) {
+      dbGet('sb-' + i).then(function (blob) { if (blob) sbSet(i, blob); }).catch(function () {});
+    }
+    function sbSet(i, blob) {
+      if (sbUrl[i]) URL.revokeObjectURL(sbUrl[i]);
+      sbUrl[i] = URL.createObjectURL(blob);
+      sbPads[i].classList.remove('rec', 'play');
+      sbPads[i].querySelector('.sb-hint').textContent = '• ' + Math.round(blob.size / 1024) + ' KB · tap to play';
+    }
+    function sbPlay(i) {
+      if (!sbUrl[i]) return;
+      while (sbPlaySet.length) { sbPlaySet.pop().pause(); }
+      var a = new Audio(sbUrl[i]);
+      a.volume = 1;
+      sbPlaySet.push(a);
+      sbPads[i].classList.add('play');
+      a.onended = function () { sbPads[i].classList.remove('play'); var k = sbPlaySet.indexOf(a); if (k !== -1) sbPlaySet.splice(k, 1); };
+      a.play();
+    }
+    function sbEnsureMic() {
+      if (sbMedia) return Promise.resolve();
+      return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } })
+        .then(function (s) { sbMedia = s; })
+        .catch(function () {
+          toast('🎙️ Mic blocked — allow microphone access for this site, then try again.');
+          throw new Error('mic');
+        });
+    }
+    function sbStartRec(i) {
+      if (sbRec !== null) return;
+      if (!sbMedia) {
+        sbEnsureMic().then(function () { sbStartRec(i); }).catch(function () {});
+        return;
+      }
+      var mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].filter(function (m) { return window.MediaRecorder && MediaRecorder.isTypeSupported(m); })[0] || '';
+      var rec;
+      try { rec = new MediaRecorder(sbMedia, mime ? { mimeType: mime } : undefined); }
+      catch (err) { rec = new MediaRecorder(sbMedia); }
+      var chunks = [];
+      rec.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      rec.onerror = function () { try { rec.stop(); } catch (e2) {} };
+      rec.onstop = function () {
+        var blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
+        sbSet(i, blob);
+        dbPut('sb-' + i, blob).then(function () { if (sbStatus) sbStatus.textContent = 'Saved pad ' + (i + 1) + ' — tap or key ' + SB_KEYS[i] + ' to play.'; }).catch(function () {});
+        sbPads[i].classList.remove('rec');
+        sbRec = null;
+        sbStopHoldTimer();
+      };
+      rec.start();
+      sbPads[i].classList.add('rec');
+      sbPads[i].querySelector('.sb-hint').textContent = '🔴 REC …';
+      if (sbStatus) sbStatus.textContent = 'Recording pad ' + (i + 1) + '…';
+      sbRec = {
+        i: i, rec: rec,
+        timer: setTimeout(function () {
+          if (sbRec && sbRec.i === i && sbRec.rec && sbRec.rec.state !== 'inactive') sbRec.rec.stop();
+        }, SB_MAX)
+      };
+    }
+
+    function sbStopRec(i) {
+      if (!sbRec || sbRec.i !== i) return;
+      clearTimeout(sbRec.timer);
+      if (sbRec.rec && sbRec.rec.state !== 'inactive') sbRec.rec.stop();
+    }
+
+    function sbHoldStart(i) {
+      if (sbHolder !== null) return;
+      if (sbRec !== null) return;
+      sbHolder = i;
+      sbHoldT = setTimeout(function () {
+        if (sbHolder !== i) return;
+        sbHolder = null; sbHoldT = null;
+        sbStartRec(i);
+      }, 350);
+    }
+    function sbHoldEnd(i) {
+      if (sbHoldT !== null && sbHolder === i) {
+        clearTimeout(sbHoldT); sbHoldT = null; sbHolder = null;
+        sbPlay(i);
+        return;
+      }
+      if (sbRec && sbRec.i === i) {
+        sbHolder = null;
+        sbStopRec(i);
+      }
+    }
+    function sbStopHoldTimer() { if (sbHoldT) { clearTimeout(sbHoldT); sbHoldT = null; sbHolder = null; } }
+
+    for (var s = 0; s < 6; s++) {
+      (function (i) {
+        var pad = document.createElement('div');
+        pad.className = 'sb-pad';
+        pad.innerHTML = '<span class="sb-rec-dot"></span><span class="sb-key">' + SB_KEYS[i] + '</span>' +
+          '<span class="sb-ico">' + SB_ICOS[i] + '</span><span class="sb-name">PAD ' + (i + 1) + '</span><span class="sb-hint">default tone</span>';
+        sbGrid.appendChild(pad);
+        sbPads.push(pad);
+        pad.addEventListener('pointerdown', function () { sbHoldStart(i); });
+        pad.addEventListener('pointerup', function () { sbHoldEnd(i); });
+        pad.addEventListener('pointerleave', function () { sbHoldEnd(i); });
+        sbSet(i, sbMap());
+        sbLoad(i);
+      })(s);
+    }
+
+    document.addEventListener('keydown', function (e) {
+      var inInput2 = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT');
+      if (inInput2 || e.repeat) return;
+      var i2 = SB_KEYS.indexOf(e.key);
+      if (i2 !== -1) sbHoldStart(i2);
+    });
+    document.addEventListener('keyup', function (e) {
+      var i3 = SB_KEYS.indexOf(e.key);
+      if (i3 !== -1) sbHoldEnd(i3);
+    });
+
+    if (sbReset) sbReset.addEventListener('click', function () {
+      for (var i = 0; i < 6; i++) {
+        dbDel('sb-' + i).catch(function () {});
+        sbSet(i, sbMap());
+      }
+      if (sbStatus) sbStatus.textContent = 'All pads reset to default tones.';
+    });
+  }
 })();
